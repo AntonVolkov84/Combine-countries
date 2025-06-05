@@ -1,4 +1,23 @@
 {
   "start": "Start Game",
-  "language": "Language"
+  "language": "Language",
+  "next": "Next",
+  "education": "Education",
+  "tests": "Tests",
+  "flag": "Flag",
+  "country": "Country",
+  "capital": "Capital",
+  "conditionAlert": "You have not selected a condition",
+  "conditionsQuestion": "What would you like to combine?",
+  "conditionsQuestionSecond": "Select what will be checked?",
+  "ruleTitle": "🌍 Combine Country",
+  "ruleDescription": "Choose what fits - a flag, a capital or a country. Guess right and earn star!",
+  "ruleTimer": "⏱️ Time Challenge",
+  "ruleTimerDescription": "You have two minutes to unswer 10 questions.",
+  "ruleMistakes": "❌ Be Careful",
+  "ruleMistakesDescription": "Three mistakes - and you`r are out. Start over! You're also losing a star",
+  "ruleStars": "⭐ Stars for Success",
+  "ruleStarsDescription": "Get all 10 right - earn a star. Collect 4 stars to unlock the super level!",
+  "ruleHint": "💡 Use a hint",
+  "ruleHintDescription": "Remove two wrong options. Only three times per round"
 }

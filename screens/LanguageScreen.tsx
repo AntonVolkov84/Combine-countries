@@ -5,15 +5,14 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import * as SecureStore from "expo-secure-store";
 import styled from "styled-components";
-import "../i18next";
 import i18next from "../i18next";
 
-type StartScreenProps = NativeStackScreenProps<RootStackParamList, "StartScreen">;
-function savePlayerLanguage(key: string, value: string) {
-  SecureStore.setItem(key, value);
+type StartScreenProps = NativeStackScreenProps<RootStackParamList, "LanguageScreen">;
+function savePlayerLanguage(key: string, value: string): Promise<void> {
+  return SecureStore.setItemAsync(key, value);
 }
-function getSavedPlayerLanguage(key: string) {
-  return SecureStore.getItem(key);
+function getSavedPlayerLanguage(key: string): Promise<string | null> {
+  return SecureStore.getItemAsync(key);
 }
 
 const BlockLanguage = styled.TouchableOpacity`
@@ -37,16 +36,17 @@ export default function LanguageScreen({ navigation }: StartScreenProps) {
     (async () => {
       const language = await getSavedPlayerLanguage("lng");
       if (language) {
-        i18next.changeLanguage(language);
-        navigation.navigate("RuleScreen");
+        goToRuleScreenWithLanguage(language);
       }
     })();
   }, []);
-
-  const changeLanguage = (lng: string): void => {
-    savePlayerLanguage("lng", lng);
-    i18next.changeLanguage(lng);
+  const goToRuleScreenWithLanguage = async (lang: string): Promise<void> => {
+    await i18next.changeLanguage(lang);
     navigation.navigate("RuleScreen");
+  };
+  const changeLanguage = async (lng: string): Promise<void> => {
+    await savePlayerLanguage("lng", lng);
+    goToRuleScreenWithLanguage(lng);
   };
 
   return (

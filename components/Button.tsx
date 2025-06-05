@@ -17,11 +17,11 @@ const ButtonCustomText = styled.Text`
 
 interface ButtonProps {
   title: string;
-  onPress: () => void;
+  onPress?: () => void;
 }
 export default function Button({ title, onPress }: ButtonProps) {
   return (
-    <ButtonCustom onPress={() => onPress()}>
+    <ButtonCustom onPress={onPress ?? undefined}>
       <LinearGradient
         colors={["#849ae9", "#6ea0eb", "#2db3f1", "#2ab4f1"]}
         start={{ x: 0.0, y: 0.0 }}

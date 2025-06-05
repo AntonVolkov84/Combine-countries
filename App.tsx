@@ -6,10 +6,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import StartScreen from "./screens/StartScreen";
 import LanguageScreen from "./screens/LanguageScreen";
 import RuleScreen from "./screens/RuleScreen";
+import ConditionsScreen from "./screens/ConditionsScreen";
+import MainlandScreen from "./screens/MainlandScreen";
 import * as NavigationBar from "expo-navigation-bar";
-import * as SecureStore from "expo-secure-store";
+import { RootStackParamList } from "./navigationtypes";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const customNavigationBar = async () => {
@@ -40,6 +42,20 @@ export default function App() {
         <Stack.Screen
           name="RuleScreen"
           component={RuleScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ConditionsScreen"
+          component={ConditionsScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="MainlandScreen"
+          component={MainlandScreen}
           options={{
             headerShown: false,
           }}
