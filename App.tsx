@@ -8,6 +8,7 @@ import LanguageScreen from "./screens/LanguageScreen";
 import RuleScreen from "./screens/RuleScreen";
 import ConditionsScreen from "./screens/ConditionsScreen";
 import MainlandScreen from "./screens/MainlandScreen";
+import TestScreen from "./screens/TestScreen";
 import * as NavigationBar from "expo-navigation-bar";
 import { RootStackParamList } from "./navigationtypes";
 
@@ -56,6 +57,13 @@ export default function App() {
         <Stack.Screen
           name="MainlandScreen"
           component={MainlandScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="TestScreen"
+          component={TestScreen}
           options={{
             headerShown: false,
           }}

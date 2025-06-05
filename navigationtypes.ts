@@ -5,6 +5,9 @@ interface EducationParams {
     secondElement: string;
   };
 }
+interface ExtendedEducationParams extends EducationParams {
+  mainland: string;
+}
 
 export type RootStackParamList = {
   StartScreen: undefined;
@@ -12,4 +15,5 @@ export type RootStackParamList = {
   RuleScreen: undefined;
   ConditionsScreen: undefined;
   MainlandScreen: EducationParams;
+  TestScreen: ExtendedEducationParams;
 };
