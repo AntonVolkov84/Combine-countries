@@ -87,7 +87,6 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
       education: false,
       params: { firstElement: firstItem, secondElement: secondItem },
     });
-    console.log(firstItem, secondItem);
   };
   return (
     <LinearGradient
