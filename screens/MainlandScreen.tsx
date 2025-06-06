@@ -9,8 +9,15 @@ import NorthAmerica from "../assets/NorthAmerica.png";
 import SouthAmerica from "../assets/SouthAmerica.png";
 import Africa from "../assets/Africa.png";
 import Asia from "../assets/Asia.png";
+import Super from "../assets/supericon.png";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "MainlandScreen">;
+
+function getSavedPlayersStars(key: string): Promise<string | null> {
+  return SecureStore.getItemAsync(key);
+}
 
 const MainScreenInfoText = styled.Text`
   color: whitesmoke;
@@ -46,6 +53,7 @@ const BlockButtonImage = styled.Image`
 `;
 
 export default function MainlandScreen({ route, navigation }: MainlandScreenProps) {
+  const [superLevelVisible, setSuperLevelVisible] = useState<boolean>(false);
   const { t } = useTranslation();
   const data = [
     {
@@ -74,7 +82,15 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
       mainland: "Asia",
     },
   ];
-
+  const checkStarForSuperLevel = async (): Promise<void> => {
+    const starsForSuperLevel = await getSavedPlayersStars("stars");
+    if (Number(starsForSuperLevel) > 4) {
+      setSuperLevelVisible(true);
+    }
+  };
+  useEffect(() => {
+    checkStarForSuperLevel();
+  }, []);
   return (
     <LinearGradient
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}
@@ -95,6 +111,16 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
             <BlockButtonText>{t(e.text)}</BlockButtonText>
           </BlockButton>
         ))}
+        {superLevelVisible && (
+          <BlockButton
+            onPress={() => {
+              navigation.navigate("TestScreen", { ...route.params, mainland: "All world" });
+            }}
+          >
+            <BlockButtonImage source={Super}></BlockButtonImage>
+            <BlockButtonText>All world</BlockButtonText>
+          </BlockButton>
+        )}
       </Block>
     </LinearGradient>
   );

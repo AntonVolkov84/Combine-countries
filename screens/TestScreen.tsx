@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import styled from "styled-components";
@@ -10,6 +10,7 @@ import Study from "../components/Study";
 import i18next from "../i18next";
 import * as SecureStore from "expo-secure-store";
 import { useState, useEffect } from "react";
+import Button from "../components/Button";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "TestScreen">;
 function savePlayersStars(key: string, value: string): Promise<void> {
@@ -20,11 +21,53 @@ function getSavedPlayersStars(key: string): Promise<string | null> {
 }
 
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
-  const [stars, setStars] = useState<number>(0);
+  const [stars, setStars] = useState<number>(Number(getSavedPlayersStars("starts")) || 0);
+  const [hints, setHints] = useState<number>(0);
+  const [mistakes, setMistakes] = useState<number>(0);
+  const [answers, setAnswers] = useState<number>(0);
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const { t } = useTranslation();
-  const countryFilteredByMainLand = countries.filter((country) => country.continents.includes(route.params.mainland));
+  const allWorld = route.params.mainland === "All world";
+  const countryFilteredByMainLand = allWorld
+    ? countries
+    : countries.filter((country) => country.continents.includes(route.params.mainland));
   const education = route.params.education;
+  const incrementStars = (): void => {
+    const resultStar = stars + 1;
+    if (resultStar > 5) {
+      savePlayersStars("stars", "0");
+      return setStars(0);
+    }
+    setStars(resultStar);
+    savePlayersStars("stars", resultStar.toString());
+  };
+  const decrementStars = (): void => {
+    const resultStar = stars - 1;
+    if (resultStar < 0) {
+      return;
+    }
+    setStars(resultStar);
+    savePlayersStars("stars", resultStar.toString());
+  };
+  const decrementHints = (): void => {
+    if (hints === 0) {
+      return Alert.alert(`${t("testalertHints")}`);
+    }
+    setHints(hints - 1);
+  };
+  const incrementMistakes = (): void => {
+    if (mistakes === 3) {
+      decrementStars();
+      return Alert.alert(`${t("testalertMistakes")}`);
+    }
+    setMistakes(mistakes + 1);
+  };
+  const incrementAnswers = (): void => {
+    if (answers === 10) {
+      return incrementStars();
+    }
+    setAnswers(answers + 1);
+  };
   return (
     <LinearGradient
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}

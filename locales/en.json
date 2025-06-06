@@ -26,5 +26,7 @@
   "ruleStars": "⭐ Stars for Success",
   "ruleStarsDescription": "Get all 10 right - earn a star. Collect 4 stars to unlock the super level!",
   "ruleHint": "💡 Use a hint",
-  "ruleHintDescription": "Remove two wrong options. Only three times per round"
+  "ruleHintDescription": "Remove two wrong options. Only three times per round",
+  "testalertHints": "Only three hints per round",
+  "testalertMistakes": "Too many mistakes, you lose a star!"
 }

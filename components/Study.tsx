@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import { useTranslation } from "react-i18next";
-import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+// import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -43,6 +43,7 @@ const InfoIcon = styled.Image`
   width: 200px;
   aspect-ratio: 1;
   border-radius: 10px;
+  object-fit: contain;
 `;
 const InfoText = styled.Text`
   color: whitesmoke;
@@ -50,33 +51,32 @@ const InfoText = styled.Text`
   text-align: center;
 `;
 
-const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-  requestNonPersonalizedAdsOnly: true,
-});
+// const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+//   requestNonPersonalizedAdsOnly: true,
+// });
 
 export default function Study({ countryFilteredByMainLand, navigation }: StudyProps) {
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
   const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
   const { t } = useTranslation();
-  useEffect(() => {
-    const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
-      setLoadedAdvertisement(true);
-    });
-    const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
-      setLoadedAdvertisement(false);
-      interstatial.load();
-      navigation.navigate("ConditionsScreen");
-    });
-    interstatial.load();
-    return () => {
-      unsubscribe();
-      unsubscribeClose();
-    };
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
+  //     setLoadedAdvertisement(true);
+  //   });
+  //   const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
+  //     setLoadedAdvertisement(false);
+  //     interstatial.load();
+  //     navigation.navigate("ConditionsScreen");
+  //   });
+  //   interstatial.load();
+  //   return () => {
+  //     unsubscribe();
+  //     unsubscribeClose();
+  //   };
+  // }, []);
   useEffect(() => {
     setItem(countryFilteredByMainLand[itemIndex]);
-    console.log(itemIndex);
   }, [itemIndex]);
   const incrementIndex = (): void => {
     if (itemIndex === countryFilteredByMainLand.length - 1) {
@@ -113,7 +113,7 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
           }
         }}
       ></Button>
-      <BannerAd
+      {/* <BannerAd
         unitId={TestIds.ADAPTIVE_BANNER}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{
@@ -122,7 +122,7 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
             collapsible: "bottom",
           },
         }}
-      />
+      /> */}
     </>
   );
 }
