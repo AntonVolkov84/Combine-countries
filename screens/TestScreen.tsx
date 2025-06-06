@@ -12,15 +12,15 @@ import * as SecureStore from "expo-secure-store";
 import { useState, useEffect } from "react";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "TestScreen">;
-// function savePlayersStars(key: string, value: string): Promise<void> {
-//   return SecureStore.setItemAsync(key, value);
-// }
-// function getSavedPlayersStars(key: string): Promise<string | null> {
-//   return SecureStore.getItemAsync(key);
-// }
+function savePlayersStars(key: string, value: string): Promise<void> {
+  return SecureStore.setItemAsync(key, value);
+}
+function getSavedPlayersStars(key: string): Promise<string | null> {
+  return SecureStore.getItemAsync(key);
+}
 
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
-  // const [stars, setStars] = useState<number>(0);
+  const [stars, setStars] = useState<number>(0);
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const { t } = useTranslation();
   const countryFilteredByMainLand = countries.filter((country) => country.continents.includes(route.params.mainland));

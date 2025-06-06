@@ -106,7 +106,8 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
         title="Back to menu"
         onPress={() => {
           if (loadedAdvertisement) {
-            interstatial.show();
+            // interstatial.show();
+            console.log("Error intarstitial");
           } else {
             navigation.navigate("ConditionsScreen");
           }
