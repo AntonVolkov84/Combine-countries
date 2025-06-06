@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "combinecountry",
+    "name": "Сombine Сountry",
     "slug": "combinecountry",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/supericon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/supericon.png",
       "resizeMode": "contain",
@@ -15,15 +15,31 @@
     "ios": {
       "supportsTablet": true
     },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9267417700367649~4295015330",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        }
+      ],
+      "expo-secure-store"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/supericon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ant_volkov.combinecountry"
     },
     "web": {
       "favicon": "./assets/supericon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "090819a2-b50f-4c9b-b351-444f71cc47ad"
+      }
     }
   }
 }
