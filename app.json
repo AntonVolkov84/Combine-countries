@@ -30,7 +30,6 @@
         "foregroundImage": "./assets/supericon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.ant_volkov.combinecountry"
     },
     "web": {

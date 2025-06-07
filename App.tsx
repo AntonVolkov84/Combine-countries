@@ -1,3 +1,5 @@
+import { enableScreens } from "react-native-screens";
+enableScreens();
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
