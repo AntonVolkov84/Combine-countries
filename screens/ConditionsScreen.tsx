@@ -114,7 +114,7 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
         <BlockButton></BlockButton>
       </Block>
       {testVisibility && (
-        <>
+        <View style={{ marginBottom: 10 }}>
           <Blockinfo>
             <BlockButtonText>{t("conditionsQuestion")}</BlockButtonText>
             <BlockChoose>
@@ -147,8 +147,9 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
             </BlockChoose>
           </Blockinfo>
           <Button title={t("next")} onPress={() => handlePickCondition(chooseItem, chooseItemSecond)} />
-        </>
+        </View>
       )}
+      <Button fontSize={18} title={t("languagechange")} onPress={() => navigation.navigate("LanguageScreen")}></Button>
     </LinearGradient>
   );
 }

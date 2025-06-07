@@ -34,5 +34,8 @@
   "ruleHintDescription": "Remove two wrong options. Only three times per round",
   "testalertHints": "Only three hints per round",
   "testalertMistakes": "Too many mistakes, you lose a star!",
+  "testQuestion": "What to combine with:",
+  "testNonAdv": "No ads, play without hints",
+  "languagechange": "Change language",
   "timerAlert": "Time is up. Start again"
 }

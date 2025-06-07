@@ -1,4 +1,4 @@
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, Image, TouchableOpacity } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import styled from "styled-components";
@@ -35,8 +35,8 @@ type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "TestScree
 function savePlayersStars(key: string, value: string): Promise<void> {
   return SecureStore.setItemAsync(key, value);
 }
-function getSavedPlayersStars(key: string): Promise<string | null> {
-  return SecureStore.getItemAsync(key);
+async function getSavedPlayersStars(key: string): Promise<string | null> {
+  return await SecureStore.getItemAsync(key);
 }
 
 const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
@@ -60,14 +60,60 @@ const BlockInfoText = styled.Text`
   font-size: 20px;
   margin-top: 5px;
 `;
+const BlockQuestion = styled.View`
+  flex-direction: column;
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+`;
+const BlockAnswers = styled.View`
+  margin-top: 10px;
+  width: 100%;
+  height: 300px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+`;
+const AnswerButton = styled.TouchableOpacity`
+  width: 42%;
+  height: 42%;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: green;
+  margin-bottom: 20px;
+`;
+const AnswerFlag = styled.Image`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+const AnswerText = styled.Text`
+  width: 100%;
+  color: whitesmoke;
+  font-size: 20px;
+  padding: 10px;
+  text-align: center;
+`;
+
+const BlockFlag = styled.Image`
+  height: 100px;
+  width: 150px;
+  margin: 5px auto;
+  object-fit: contain;
+  border-radius: 5px;
+`;
 
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
-  const [stars, setStars] = useState<number>(Number(getSavedPlayersStars("starts")) || 0);
-  const [seconds, setSeconds] = useState<number>(1251);
-  const [hints, setHints] = useState<number>(0);
+  const [stars, setStars] = useState<number>(0);
+  const [seconds, setSeconds] = useState<number>(120);
+  const [hints, setHints] = useState<number>(2);
   const [mistakes, setMistakes] = useState<number>(0);
   const [answers, setAnswers] = useState<number>(0);
+  const [hiddenOptions, setHiddenOptions] = useState<string[]>([]);
   const [question, setQuestion] = useState<TestQuestion | null>(null);
+  const [questionLoaded, setQuestionLoaded] = useState<boolean>(false);
   const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const { t } = useTranslation();
@@ -79,14 +125,14 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     ? countries
     : countries.filter((country) => country.continents.includes(route.params.mainland));
   const education = route.params.education;
-  const incrementStars = (): void => {
+  const incrementStars = async (): Promise<void> => {
     const resultStar = stars + 1;
-    if (resultStar > 5) {
-      savePlayersStars("stars", "0");
+    if (resultStar > 4) {
+      await savePlayersStars("stars", "0");
       return setStars(0);
+    } else {
+      await savePlayersStars("stars", resultStar.toString());
     }
-    setStars(resultStar);
-    savePlayersStars("stars", resultStar.toString());
   };
   const decrementStars = (): void => {
     const resultStar = stars - 1;
@@ -96,22 +142,21 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     setStars(resultStar);
     savePlayersStars("stars", resultStar.toString());
   };
-  const decrementHints = (): void => {
-    if (hints === 0) {
-      return Alert.alert(`${t("testalertHints")}`);
-    }
-    setHints(hints - 1);
-  };
+
   const incrementMistakes = (): void => {
-    if (mistakes === 3) {
+    if (mistakes === 2) {
       decrementStars();
-      return Alert.alert(`${t("testalertMistakes")}`);
+      Alert.alert(`${t("testalertMistakes")}`);
+      setMistakes(0);
+      return navigation.navigate("ConditionsScreen");
     }
     setMistakes(mistakes + 1);
   };
   const incrementAnswers = (): void => {
-    if (answers === 10) {
-      return incrementStars();
+    if (answers === 9) {
+      incrementStars();
+      setAnswers(0);
+      return navigation.navigate("ConditionsScreen");
     }
     setAnswers(answers + 1);
   };
@@ -163,15 +208,47 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       correctAnswer,
     };
   }
+
   const handleNextQuestion = () => {
     const next = generateTestQuestionSimple(countryFiltered, firstElement!, secondElement!);
     if (next) setQuestion(next);
   };
-  useEffect(() => {
-    const generated = generateTestQuestionSimple(countryFiltered, firstElement!, secondElement!);
+  const takeHint = () => {
+    if (!question || hints <= 0) return;
 
+    const wrongOptions = question.options.filter(
+      (opt) => opt !== question.correctAnswer && !hiddenOptions.includes(opt)
+    );
+
+    if (wrongOptions.length > 0) {
+      const optionToHide = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+      setHiddenOptions((prev) => [...prev, optionToHide]);
+    }
+
+    setHints((prev) => prev - 1);
+  };
+  const checkAnswer = (answer: string): void => {
+    if (answer === question?.correctAnswer) {
+      incrementAnswers();
+      setHiddenOptions([]);
+      return handleNextQuestion();
+    }
+    incrementMistakes();
+    setHiddenOptions([]);
+    return handleNextQuestion();
+  };
+
+  useEffect(() => {
+    async function fetchStars() {
+      const saved = await getSavedPlayersStars("stars");
+      setStars(saved ? Number(saved) : 0);
+    }
+    fetchStars();
+
+    const generated = generateTestQuestionSimple(countryFiltered, firstElement!, secondElement!);
     if (generated) {
       setQuestion(generated);
+      setQuestionLoaded(true);
     }
   }, []);
 
@@ -195,7 +272,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
       setLoadedAdvertisement(false);
       interstatial.load();
-      setHints(3);
+      setHints(5);
     });
     interstatial.load();
     return () => {
@@ -203,6 +280,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       unsubscribeClose();
     };
   }, []);
+
   return (
     <LinearGradient
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}
@@ -233,9 +311,52 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
               {t("answers")} {answers}
             </BlockInfoText>
           </BlockInfo>
-          <BlockInfo>
-            <Button fontSize={15} title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`} />
+          <BlockInfo style={{ marginTop: 20 }}>
+            <Button
+              fontSize={15}
+              title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`}
+              onPress={() => {
+                if (hints === 0) {
+                  if (loadedAdvertisement) {
+                    interstatial.show();
+                  } else {
+                    Alert.alert(`${t("testNonAdv")}`);
+                  }
+                } else {
+                  takeHint();
+                }
+              }}
+            />
           </BlockInfo>
+          <BlockQuestion>
+            <BlockInfoText>{t("testQuestion")}</BlockInfoText>
+            <BlockInfoText>{t(firstElement)}:</BlockInfoText>
+            {firstElement === "flag" ? (
+              <BlockFlag source={{ uri: question?.question }}></BlockFlag>
+            ) : (
+              <BlockInfoText style={{ marginTop: 30, fontSize: 40 }}>{question?.question}</BlockInfoText>
+            )}
+          </BlockQuestion>
+          <BlockInfoText>{t(secondElement)}:</BlockInfoText>
+          <BlockAnswers>
+            {questionLoaded &&
+              question!.options.map((option, i) => {
+                if (hiddenOptions.includes(option)) return null;
+                const displayText = option;
+                if (secondElement === "flag") {
+                  return (
+                    <AnswerButton onPress={() => checkAnswer(option)} key={i}>
+                      <AnswerFlag source={{ uri: option }} />
+                    </AnswerButton>
+                  );
+                }
+                return (
+                  <AnswerButton onPress={() => checkAnswer(option)} key={i}>
+                    <AnswerText>{displayText}</AnswerText>
+                  </AnswerButton>
+                );
+              })}
+          </BlockAnswers>
           <BannerAd
             unitId={TestIds.ADAPTIVE_BANNER}
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
