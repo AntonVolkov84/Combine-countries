@@ -9,17 +9,18 @@ const ButtonCustom = styled.TouchableOpacity`
   margin: 0 auto;
   border-radius: 28px;
 `;
-const ButtonCustomText = styled.Text`
+const ButtonCustomText = styled.Text<{ fontSize?: number }>`
   color: whitesmoke;
   text-align: center;
-  font-size: 20px;
+  font-size: ${({ fontSize }) => fontSize ?? 20}px;
 `;
 
 interface ButtonProps {
   title: string;
   onPress?: () => void;
+  fontSize?: number;
 }
-export default function Button({ title, onPress }: ButtonProps) {
+export default function Button({ title, onPress, fontSize }: ButtonProps) {
   return (
     <ButtonCustom onPress={onPress ?? undefined}>
       <LinearGradient
@@ -36,7 +37,7 @@ export default function Button({ title, onPress }: ButtonProps) {
           justifyContent: "center",
         }}
       >
-        <ButtonCustomText>{title}</ButtonCustomText>
+        <ButtonCustomText fontSize={fontSize}>{title}</ButtonCustomText>
       </LinearGradient>
     </ButtonCustom>
   );
