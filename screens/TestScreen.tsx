@@ -11,6 +11,7 @@ import i18next from "../i18next";
 import * as SecureStore from "expo-secure-store";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
+import Starts from "../components/Starts";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "TestScreen">;
 function savePlayersStars(key: string, value: string): Promise<void> {
@@ -20,8 +21,13 @@ function getSavedPlayersStars(key: string): Promise<string | null> {
   return SecureStore.getItemAsync(key);
 }
 
+const BlockStars = styled.View`
+  width: 100%;
+  height: 50px;
+`;
+
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
-  const [stars, setStars] = useState<number>(Number(getSavedPlayersStars("starts")) || 0);
+  const [stars, setStars] = useState<number>(Number(getSavedPlayersStars("starts")) || 4);
   const [hints, setHints] = useState<number>(0);
   const [mistakes, setMistakes] = useState<number>(0);
   const [answers, setAnswers] = useState<number>(0);
@@ -78,7 +84,9 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       {education ? (
         <Study countryFilteredByMainLand={countryFilteredByMainLand} navigation={navigation}></Study>
       ) : (
-        <></>
+        <BlockStars>
+          <Starts stars={stars} />
+        </BlockStars>
       )}
     </LinearGradient>
   );
