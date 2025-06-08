@@ -143,11 +143,11 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
         <InfoText>{`${t("capital")}: ${item?.capital[0]}`}</InfoText>
       </BlockInfo>
       <BlockBtn>
-        <Button title="Back" onPress={() => decrementIndex()}></Button>
-        <Button title="Next" onPress={() => incrementIndex()}></Button>
+        <Button title={t("back")} onPress={() => decrementIndex()}></Button>
+        <Button title={t("next")} onPress={() => incrementIndex()}></Button>
       </BlockBtn>
       <Button
-        title="Back to menu"
+        title={t("tomenu")}
         onPress={() => {
           if (loadedAdvertisement) {
             interstatial.show();

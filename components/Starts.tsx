@@ -17,14 +17,13 @@ const StarText = styled(Animated.Text)`
 `;
 
 export default function Stars({ stars }: StarsProps) {
-  const animations = useRef<Animated.Value[]>([]).current;
-
-  if (animations.length !== stars) {
-    animations.splice(0, animations.length, ...Array.from({ length: stars }, () => new Animated.Value(0)));
-  }
+  const animations = useRef<Animated.Value[]>([]);
 
   useEffect(() => {
-    animations.forEach((anim, index) => {
+    // Обновляем массив анимаций при изменении количества звёзд
+    animations.current = Array.from({ length: stars }, (_, i) => new Animated.Value(0));
+
+    animations.current.forEach((anim, index) => {
       Animated.loop(
         Animated.sequence([
           Animated.timing(anim, {
@@ -41,11 +40,11 @@ export default function Stars({ stars }: StarsProps) {
         ])
       ).start();
     });
-  }, [animations]);
+  }, [stars]);
 
   return (
     <BlockStar>
-      {animations.map((anim, index) => {
+      {animations.current.map((anim, index) => {
         const rotateY = anim.interpolate({
           inputRange: [0, 1],
           outputRange: ["0deg", "360deg"],
@@ -55,10 +54,7 @@ export default function Stars({ stars }: StarsProps) {
           <StarText
             key={index}
             style={{
-              transform: [
-                { perspective: 800 }, // Важно для 3D
-                { rotateY },
-              ],
+              transform: [{ perspective: 800 }, { rotateY }],
             }}
           >
             ⭐

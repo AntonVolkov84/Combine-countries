@@ -84,10 +84,11 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
   ];
   const checkStarForSuperLevel = async (): Promise<void> => {
     const starsForSuperLevel = await getSavedPlayersStars("stars");
-    if (Number(starsForSuperLevel) > 4) {
+    if (Number(starsForSuperLevel) === 4) {
       setSuperLevelVisible(true);
     }
   };
+
   useEffect(() => {
     checkStarForSuperLevel();
   }, []);

@@ -146,7 +146,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const education = route.params.education;
   const incrementStars = async (): Promise<void> => {
     const resultStar = stars + 1;
-    if (resultStar > 4) {
+    if (resultStar > 5) {
       await savePlayersStars("stars", "0");
       return setStars(0);
     } else {
@@ -175,7 +175,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     if (answers === 9) {
       incrementStars();
       setAnswers(0);
-      return navigation.navigate("ConditionsScreen");
+      return navigation.replace("StarScreen");
     }
     setAnswers(answers + 1);
   };
@@ -273,18 +273,28 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   }, []);
 
   useEffect(() => {
-    if (seconds === 0) {
-      Alert.alert(`${t("timerAlert")}`);
-      navigation.navigate("MainlandScreen", route.params);
-      return;
-    }
-
     const interval = setInterval(() => {
-      setSeconds((prev) => prev - 1);
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval); // ⛔ остановить интервал
+          console.log("⏱️ Таймер дошёл до 0 и остановлен");
+
+          Alert.alert(`${t("timerAlert")}`);
+          navigation.navigate("MainlandScreen", route.params);
+
+          return 0; // вернуть 0, не -1
+        }
+
+        return prev - 1;
+      });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [seconds]);
+    return () => {
+      clearInterval(interval);
+      console.log("⏱️ Очистка таймера при размонтировании");
+    };
+  }, []);
+
   useEffect(() => {
     player.loop = true;
     player.volume = 1;

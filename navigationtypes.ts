@@ -16,4 +16,5 @@ export type RootStackParamList = {
   ConditionsScreen: undefined;
   MainlandScreen: EducationParams;
   TestScreen: ExtendedEducationParams;
+  StarScreen: undefined;
 };
