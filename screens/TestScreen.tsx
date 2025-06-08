@@ -13,6 +13,11 @@ import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Starts from "../components/Starts";
 import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useAudioPlayer } from "expo-audio";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+const audioSource = require("../assets/miami.mp3");
 interface FilteredCountry {
   flags: {
     png: string;
@@ -58,12 +63,12 @@ const BlockInfoText = styled.Text`
   text-align: center;
   color: whitesmoke;
   font-size: 20px;
-  margin-top: 5px;
+  margin-top: 3px;
 `;
 const BlockQuestion = styled.View`
   flex-direction: column;
   width: 100%;
-  height: 200px;
+  height: 170px;
   margin-top: 10px;
 `;
 const BlockAnswers = styled.View`
@@ -105,6 +110,19 @@ const BlockFlag = styled.Image`
   border-radius: 5px;
 `;
 
+const BlokcMusic = styled.View`
+  position: absolute;
+  flex-direction: row;
+  gap: 20px;
+  width: 100px;
+  justify-content: center;
+  z-index: 2;
+  right: 10px;
+  top: 20%;
+`;
+
+const ButtonSound = styled.TouchableOpacity``;
+
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const [stars, setStars] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(120);
@@ -120,6 +138,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const allWorld = route.params.mainland === "All world";
   const firstElement = route.params.params?.firstElement;
   const secondElement = route.params.params?.secondElement;
+  const player = useAudioPlayer(audioSource);
 
   const countryFiltered = allWorld
     ? countries
@@ -239,6 +258,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   };
 
   useEffect(() => {
+    player.play();
     async function fetchStars() {
       const saved = await getSavedPlayersStars("stars");
       setStars(saved ? Number(saved) : 0);
@@ -266,6 +286,10 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     return () => clearInterval(interval);
   }, [seconds]);
   useEffect(() => {
+    player.loop = true;
+    player.volume = 1;
+  }, [player]);
+  useEffect(() => {
     const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
     });
@@ -280,6 +304,9 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       unsubscribeClose();
     };
   }, []);
+  useEffect(() => {
+    if (education) setSeconds(3600);
+  }, [education]);
 
   return (
     <LinearGradient
@@ -311,7 +338,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
               {t("answers")} {answers}
             </BlockInfoText>
           </BlockInfo>
-          <BlockInfo style={{ marginTop: 20 }}>
+          <BlockInfo style={{ marginTop: 20, position: "relative" }}>
             <Button
               fontSize={15}
               title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`}
@@ -327,6 +354,20 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
                 }
               }}
             />
+            <BlokcMusic>
+              {player.playing ? (
+                <ButtonSound onPress={() => player.pause()}>
+                  <Feather name="pause-circle" size={30} color="gold" />
+                </ButtonSound>
+              ) : (
+                <ButtonSound onPress={() => player.play()}>
+                  <FontAwesome name="play-circle-o" size={30} color="gold" />
+                </ButtonSound>
+              )}
+              <ButtonSound onPress={() => navigation.navigate("LanguageScreen")}>
+                <MaterialIcons name="language" size={30} color="gold" />
+              </ButtonSound>
+            </BlokcMusic>
           </BlockInfo>
           <BlockQuestion>
             <BlockInfoText>{t("testQuestion")}</BlockInfoText>

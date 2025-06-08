@@ -44,13 +44,13 @@ const BlockButtonImage = styled.Image`
 const Blockinfo = styled.View`
   flex-direction: column;
   width: 90%;
-  height: 460px;
+  height: 410px;
   align-self: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 `;
 const BlockChoose = styled.View`
   width: 100%;
-  height: 200px;
+  height: 180px;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
@@ -149,7 +149,6 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
           <Button title={t("next")} onPress={() => handlePickCondition(chooseItem, chooseItemSecond)} />
         </View>
       )}
-      <Button fontSize={18} title={t("languagechange")} onPress={() => navigation.navigate("LanguageScreen")}></Button>
     </LinearGradient>
   );
 }

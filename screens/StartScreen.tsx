@@ -16,6 +16,7 @@ const StartScreenLogo = styled.Image.attrs({
   aspect-ratio: 1;
   height: ${deviceWidth}px;
   margin-bottom: 30px;
+  margin-top: 100px;
 `;
 
 export default function StartScreen({ navigation }: StartScreenProps) {
