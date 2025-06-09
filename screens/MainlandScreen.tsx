@@ -84,7 +84,7 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
   ];
   const checkStarForSuperLevel = async (): Promise<void> => {
     const starsForSuperLevel = await getSavedPlayersStars("stars");
-    if (Number(starsForSuperLevel) === 4) {
+    if (Number(starsForSuperLevel) >= 4) {
       setSuperLevelVisible(true);
     }
   };
@@ -101,26 +101,29 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
     >
       <MainScreenInfoText>{t("mainlandInfo")}</MainScreenInfoText>
       <Block>
-        {data.map((e) => (
-          <BlockButton
-            onPress={() => {
-              navigation.navigate("TestScreen", { ...route.params, mainland: e.mainland });
-            }}
-            key={e.text}
-          >
-            <BlockButtonImage source={e.uri}></BlockButtonImage>
-            <BlockButtonText>{t(e.text)}</BlockButtonText>
-          </BlockButton>
-        ))}
-        {superLevelVisible && (
+        {superLevelVisible ? (
           <BlockButton
             onPress={() => {
               navigation.navigate("TestScreen", { ...route.params, mainland: "All world" });
             }}
           >
             <BlockButtonImage source={Super}></BlockButtonImage>
-            <BlockButtonText>All world</BlockButtonText>
+            <BlockButtonText>{t("allworld")}</BlockButtonText>
           </BlockButton>
+        ) : (
+          <>
+            {data.map((e) => (
+              <BlockButton
+                onPress={() => {
+                  navigation.navigate("TestScreen", { ...route.params, mainland: e.mainland });
+                }}
+                key={e.text}
+              >
+                <BlockButtonImage source={e.uri}></BlockButtonImage>
+                <BlockButtonText>{t(e.text)}</BlockButtonText>
+              </BlockButton>
+            ))}
+          </>
         )}
       </Block>
     </LinearGradient>

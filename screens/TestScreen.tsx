@@ -13,11 +13,10 @@ import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Starts from "../components/Starts";
 import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
-import { useAudioPlayer } from "expo-audio";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-const audioSource = require("../assets/miami.mp3");
+
 interface FilteredCountry {
   flags: {
     png: string;
@@ -68,7 +67,7 @@ const BlockInfoText = styled.Text`
 const BlockQuestion = styled.View`
   flex-direction: column;
   width: 100%;
-  height: 170px;
+  height: 220px;
   margin-top: 10px;
 `;
 const BlockAnswers = styled.View`
@@ -138,7 +137,6 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const allWorld = route.params.mainland === "All world";
   const firstElement = route.params.params?.firstElement;
   const secondElement = route.params.params?.secondElement;
-  const player = useAudioPlayer(audioSource);
 
   const countryFiltered = allWorld
     ? countries
@@ -258,7 +256,6 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   };
 
   useEffect(() => {
-    player.play();
     async function fetchStars() {
       const saved = await getSavedPlayersStars("stars");
       setStars(saved ? Number(saved) : 0);
@@ -276,13 +273,13 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     const interval = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
-          clearInterval(interval); // ⛔ остановить интервал
+          clearInterval(interval);
           console.log("⏱️ Таймер дошёл до 0 и остановлен");
 
           Alert.alert(`${t("timerAlert")}`);
           navigation.navigate("MainlandScreen", route.params);
 
-          return 0; // вернуть 0, не -1
+          return 0;
         }
 
         return prev - 1;
@@ -291,14 +288,9 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
 
     return () => {
       clearInterval(interval);
-      console.log("⏱️ Очистка таймера при размонтировании");
     };
   }, []);
 
-  useEffect(() => {
-    player.loop = true;
-    player.volume = 1;
-  }, [player]);
   useEffect(() => {
     const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
@@ -365,15 +357,6 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
               }}
             />
             <BlokcMusic>
-              {player.playing ? (
-                <ButtonSound onPress={() => player.pause()}>
-                  <Feather name="pause-circle" size={30} color="gold" />
-                </ButtonSound>
-              ) : (
-                <ButtonSound onPress={() => player.play()}>
-                  <FontAwesome name="play-circle-o" size={30} color="gold" />
-                </ButtonSound>
-              )}
               <ButtonSound onPress={() => navigation.navigate("LanguageScreen")}>
                 <MaterialIcons name="language" size={30} color="gold" />
               </ButtonSound>
@@ -385,7 +368,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
             {firstElement === "flag" ? (
               <BlockFlag source={{ uri: question?.question }}></BlockFlag>
             ) : (
-              <BlockInfoText style={{ marginTop: 30, fontSize: 40 }}>{question?.question}</BlockInfoText>
+              <BlockInfoText style={{ marginTop: 10, fontSize: 35 }}>{question?.question}</BlockInfoText>
             )}
           </BlockQuestion>
           <BlockInfoText>{t(secondElement)}:</BlockInfoText>

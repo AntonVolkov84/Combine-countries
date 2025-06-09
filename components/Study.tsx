@@ -6,11 +6,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import { useTranslation } from "react-i18next";
 import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
-import { useAudioPlayer } from "expo-audio";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Feather from "@expo/vector-icons/Feather";
+// import FontAwesome from "@expo/vector-icons/FontAwesome";
+// import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-const audioSource = require("../assets/miami.mp3");
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -66,7 +64,12 @@ const BlokcMusic = styled.View`
 `;
 
 const ButtonSound = styled.TouchableOpacity``;
-
+const BlockBanner = styled.View`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
 const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
 });
@@ -75,16 +78,10 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
   const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
+  const [sound, setSound] = useState();
   const { t } = useTranslation();
-  const player = useAudioPlayer(audioSource);
 
   useEffect(() => {
-    player.loop = true;
-    player.volume = 1;
-  }, [player]);
-
-  useEffect(() => {
-    player.play();
     const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
       console.log("Loaded");
@@ -98,7 +95,7 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
       console.log("Interstitial error", err);
     });
     interstatial.load();
-    return () => {
+    return (): void => {
       unsubscribe();
       unsubscribeClose();
       unsubscribeError();
@@ -124,15 +121,6 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
     <>
       <BlockInfo>
         <BlokcMusic>
-          {player.playing ? (
-            <ButtonSound onPress={() => player.pause()}>
-              <Feather name="pause-circle" size={30} color="gold" />
-            </ButtonSound>
-          ) : (
-            <ButtonSound onPress={() => player.play()}>
-              <FontAwesome name="play-circle-o" size={30} color="gold" />
-            </ButtonSound>
-          )}
           <ButtonSound onPress={() => navigation.navigate("LanguageScreen")}>
             <MaterialIcons name="language" size={30} color="gold" />
           </ButtonSound>
@@ -156,17 +144,28 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
           }
         }}
       ></Button>
-      <BannerAd
-        unitId={TestIds.ADAPTIVE_BANNER}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        onAdFailedToLoad={(err) => console.log("Banner error", err)}
-        requestOptions={{
-          requestNonPersonalizedAdsOnly: true,
-          networkExtras: {
-            collapsible: "bottom",
-          },
-        }}
-      />
+      <BlockBanner>
+        <BannerAd
+          unitId={TestIds.ADAPTIVE_BANNER}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+            networkExtras: {
+              collapsible: "bottom",
+            },
+          }}
+        />
+      </BlockBanner>
     </>
   );
 }
+
+// {player.playing ? (
+//             <ButtonSound onPress={() => player.pause()}>
+//               <Feather name="pause-circle" size={30} color="gold" />
+//             </ButtonSound>
+//           ) : (
+//             <ButtonSound onPress={() => player.play()}>
+//               <FontAwesome name="play-circle-o" size={30} color="gold" />
+//             </ButtonSound>
+//           )}

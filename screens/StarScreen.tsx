@@ -31,13 +31,12 @@ export default function StarScreen({ navigation }: StartScreenProps) {
         style={{
           width: "100%",
           aspectRatio: 1 / 1,
-          backgroundColor: "#1E2322",
           overflow: "hidden",
           marginBottom: 20,
         }}
         source={require("../Animation.json")}
       />
-      <Button title={t("tomenu")} />
+      <Button onPress={() => navigation.navigate("ConditionsScreen")} title={t("tomenu")} />
     </LinearGradient>
   );
 }
