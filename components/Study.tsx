@@ -78,7 +78,6 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
   const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
-  const [sound, setSound] = useState();
   const { t } = useTranslation();
 
   useEffect(() => {

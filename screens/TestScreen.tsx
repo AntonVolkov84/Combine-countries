@@ -12,7 +12,14 @@ import * as SecureStore from "expo-secure-store";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Starts from "../components/Starts";
-import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import {
+  AdEventType,
+  BannerAd,
+  BannerAdSize,
+  RewardedInterstitialAd,
+  RewardedAdEventType,
+  TestIds,
+} from "react-native-google-mobile-ads";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -43,7 +50,7 @@ async function getSavedPlayersStars(key: string): Promise<string | null> {
   return await SecureStore.getItemAsync(key);
 }
 
-const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+const interstatial: RewardedInterstitialAd = RewardedInterstitialAd.createForAdRequest(TestIds.REWARDED_INTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
 });
 
@@ -292,18 +299,21 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
+    const unsubscribe = interstatial.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
     });
     const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
       setLoadedAdvertisement(false);
       interstatial.load();
-      setHints(5);
+    });
+    const unsubscribeEarned = interstatial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      setHints(reward.amount);
     });
     interstatial.load();
     return () => {
       unsubscribe();
       unsubscribeClose();
+      unsubscribeEarned();
     };
   }, []);
   useEffect(() => {
