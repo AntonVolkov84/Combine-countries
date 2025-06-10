@@ -16,7 +16,7 @@ import {
   AdEventType,
   BannerAd,
   BannerAdSize,
-  RewardedAd,
+  RewardedInterstitialAd,
   RewardedAdEventType,
   TestIds,
 } from "react-native-google-mobile-ads";
@@ -50,9 +50,12 @@ async function getSavedPlayersStars(key: string): Promise<string | null> {
   return await SecureStore.getItemAsync(key);
 }
 
-const interstatial: RewardedAd = RewardedAd.createForAdRequest(TestIds.REWARDED, {
-  requestNonPersonalizedAdsOnly: true,
-});
+const rewardedInterstatial: RewardedInterstitialAd = RewardedInterstitialAd.createForAdRequest(
+  TestIds.REWARDED_INTERSTITIAL,
+  {
+    requestNonPersonalizedAdsOnly: true,
+  }
+);
 
 const BlockStars = styled.View`
   width: 100%;
@@ -305,22 +308,30 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = interstatial.addAdEventListener(RewardedAdEventType.LOADED, () => {
+    const unsubscribe = rewardedInterstatial.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
+      Alert.alert("Load rewardedInterstatial");
     });
-    const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
+    const unsubscribeClose = rewardedInterstatial.addAdEventListener(AdEventType.CLOSED, () => {
       setLoadedAdvertisement(false);
-      interstatial.load();
+      Alert.alert(`Close interstitial`);
+      rewardedInterstatial.load();
     });
-    const unsubscribeEarned = interstatial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      setHints(reward.amount);
-      Alert.alert(`${reward}`);
+    const unsubscribeEarned = rewardedInterstatial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      setTimeout(() => {
+        setHints(reward.amount);
+        Alert.alert(`Получена награда: ${reward.amount} ${reward.type}`);
+      }, 100);
     });
-    interstatial.load();
+    const unsubscribeError = rewardedInterstatial.addAdEventListener(AdEventType.ERROR, (error) => {
+      Alert.alert("Ошибка загрузки рекламы", error?.message || "Неизвестная ошибка");
+    });
+    rewardedInterstatial.load();
     return () => {
       unsubscribe();
       unsubscribeClose();
       unsubscribeEarned();
+      unsubscribeError();
     };
   }, []);
   useEffect(() => {
@@ -364,7 +375,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
               onPress={() => {
                 if (hints === 0) {
                   if (loadedAdvertisement) {
-                    interstatial.show();
+                    rewardedInterstatial.show();
                   } else {
                     Alert.alert(`${t("testNonAdv")}`);
                   }
@@ -408,20 +419,20 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
                 );
               })}
           </BlockAnswers>
-          <BlockBanner>
-            <BannerAd
-              unitId={TestIds.ADAPTIVE_BANNER}
-              size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-              requestOptions={{
-                requestNonPersonalizedAdsOnly: true,
-                networkExtras: {
-                  collapsible: "bottom",
-                },
-              }}
-            />
-          </BlockBanner>
         </>
       )}
+      <BlockBanner>
+        <BannerAd
+          unitId={TestIds.ADAPTIVE_BANNER}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+            networkExtras: {
+              collapsible: "bottom",
+            },
+          }}
+        />
+      </BlockBanner>
     </LinearGradient>
   );
 }

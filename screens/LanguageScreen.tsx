@@ -1,5 +1,4 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
@@ -10,9 +9,6 @@ import i18next from "../i18next";
 type StartScreenProps = NativeStackScreenProps<RootStackParamList, "LanguageScreen">;
 function savePlayerLanguage(key: string, value: string): Promise<void> {
   return SecureStore.setItemAsync(key, value);
-}
-function getSavedPlayerLanguage(key: string): Promise<string | null> {
-  return SecureStore.getItemAsync(key);
 }
 
 const BlockLanguage = styled.TouchableOpacity`
@@ -32,21 +28,12 @@ const LanguageText = styled.Text`
 `;
 
 export default function LanguageScreen({ navigation }: StartScreenProps) {
-  useEffect(() => {
-    (async () => {
-      const language = await getSavedPlayerLanguage("lng");
-      if (language) {
-        goToRuleScreenWithLanguage(language);
-      }
-    })();
-  }, []);
-  const goToRuleScreenWithLanguage = async (lang: string): Promise<void> => {
-    await i18next.changeLanguage(lang);
-    navigation.navigate("RuleScreen");
-  };
   const changeLanguage = async (lng: string): Promise<void> => {
     await savePlayerLanguage("lng", lng);
-    goToRuleScreenWithLanguage(lng);
+    await i18next.changeLanguage(lng);
+    requestAnimationFrame(() => {
+      navigation.replace("RuleScreen");
+    });
   };
 
   return (
