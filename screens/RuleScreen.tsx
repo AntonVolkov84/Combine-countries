@@ -38,7 +38,9 @@ export default function RuleScreen({ navigation }: StartScreenProps) {
       <TitleText>{t("ruleStars")}</TitleText>
       <TitleDescription>{t("ruleStarsDescription")}</TitleDescription>
       <TitleText>{t("ruleHint")}</TitleText>
-      <TitleDescription style={{ marginBottom: 25 }}>{t("ruleHintDescription")}</TitleDescription>
+      <TitleDescription>{t("ruleHintDescription")}</TitleDescription>
+      <TitleText>{t("ruleTarget")}</TitleText>
+      <TitleDescription style={{ marginBottom: 25 }}>{t("ruleTargetDescription")}</TitleDescription>
       <Button title={t("next")} onPress={() => navigation.navigate("ConditionsScreen")} />
     </LinearGradient>
   );

@@ -16,7 +16,7 @@ import {
   AdEventType,
   BannerAd,
   BannerAdSize,
-  RewardedInterstitialAd,
+  RewardedAd,
   RewardedAdEventType,
   TestIds,
 } from "react-native-google-mobile-ads";
@@ -50,7 +50,7 @@ async function getSavedPlayersStars(key: string): Promise<string | null> {
   return await SecureStore.getItemAsync(key);
 }
 
-const interstatial: RewardedInterstitialAd = RewardedInterstitialAd.createForAdRequest(TestIds.REWARDED_INTERSTITIAL, {
+const interstatial: RewardedAd = RewardedAd.createForAdRequest(TestIds.REWARDED, {
   requestNonPersonalizedAdsOnly: true,
 });
 
@@ -308,6 +308,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     });
     const unsubscribeEarned = interstatial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
       setHints(reward.amount);
+      Alert.alert(`${reward}`);
     });
     interstatial.load();
     return () => {

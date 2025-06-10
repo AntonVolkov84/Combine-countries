@@ -85,18 +85,12 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
       setLoadedAdvertisement(true);
       console.log("Loaded");
     });
-    const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
-      setLoadedAdvertisement(false);
-      interstatial.load();
-      navigation.navigate("ConditionsScreen");
-    });
     const unsubscribeError = interstatial.addAdEventListener(AdEventType.ERROR, (err) => {
       console.log("Interstitial error", err);
     });
     interstatial.load();
     return (): void => {
       unsubscribe();
-      unsubscribeClose();
       unsubscribeError();
     };
   }, []);
@@ -120,7 +114,13 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
     <>
       <BlockInfo>
         <BlokcMusic>
-          <ButtonSound onPress={() => navigation.navigate("LanguageScreen")}>
+          <ButtonSound
+            onPress={() => {
+              requestAnimationFrame(() => {
+                navigation.navigate("LanguageScreen");
+              });
+            }}
+          >
             <MaterialIcons name="language" size={30} color="gold" />
           </ButtonSound>
         </BlokcMusic>
@@ -137,6 +137,10 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
         title={t("tomenu")}
         onPress={() => {
           if (loadedAdvertisement) {
+            const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
+              navigation.navigate("ConditionsScreen");
+              interstatial.removeAllListeners();
+            });
             interstatial.show();
           } else {
             navigation.navigate("ConditionsScreen");
