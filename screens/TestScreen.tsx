@@ -74,7 +74,7 @@ const BlockInfoText = styled.Text`
 const BlockQuestion = styled.View`
   flex-direction: column;
   width: 100%;
-  height: 220px;
+  height: 170px;
   margin-top: 10px;
 `;
 const BlockAnswers = styled.View`
@@ -87,7 +87,7 @@ const BlockAnswers = styled.View`
 `;
 const AnswerButton = styled.TouchableOpacity`
   width: 42%;
-  height: 42%;
+  height: 40%;
   justify-content: space-around;
   align-items: center;
   border-radius: 5px;
@@ -128,6 +128,12 @@ const BlokcMusic = styled.View`
 `;
 
 const ButtonSound = styled.TouchableOpacity``;
+const BlockBanner = styled.View`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
 
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const [stars, setStars] = useState<number>(0);
@@ -379,7 +385,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
             {firstElement === "flag" ? (
               <BlockFlag source={{ uri: question?.question }}></BlockFlag>
             ) : (
-              <BlockInfoText style={{ marginTop: 10, fontSize: 35 }}>{question?.question}</BlockInfoText>
+              <BlockInfoText style={{ marginTop: 10, fontSize: 30 }}>{question?.question}</BlockInfoText>
             )}
           </BlockQuestion>
           <BlockInfoText>{t(secondElement)}:</BlockInfoText>
@@ -402,16 +408,18 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
                 );
               })}
           </BlockAnswers>
-          <BannerAd
-            unitId={TestIds.ADAPTIVE_BANNER}
-            size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-            requestOptions={{
-              requestNonPersonalizedAdsOnly: true,
-              networkExtras: {
-                collapsible: "bottom",
-              },
-            }}
-          />
+          <BlockBanner>
+            <BannerAd
+              unitId={TestIds.ADAPTIVE_BANNER}
+              size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+                networkExtras: {
+                  collapsible: "bottom",
+                },
+              }}
+            />
+          </BlockBanner>
         </>
       )}
     </LinearGradient>
