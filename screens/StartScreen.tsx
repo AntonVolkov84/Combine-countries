@@ -28,8 +28,6 @@ export default function StartScreen({ navigation }: StartScreenProps) {
     const language = await getSavedPlayerLanguage("lng");
     if (language) {
       navigation.replace("RuleScreen");
-    } else {
-      navigation.replace("LanguageScreen");
     }
   };
   useEffect(() => {

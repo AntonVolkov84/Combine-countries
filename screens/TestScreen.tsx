@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import countries_en from "../Countries_en.json";
 import countries_ua from "../Countries_ua.json";
-import Study from "../components/Study";
 import i18next from "../i18next";
 import * as SecureStore from "expo-secure-store";
 import { useState, useEffect } from "react";
@@ -20,8 +19,8 @@ import {
   RewardedAdEventType,
   TestIds,
 } from "react-native-google-mobile-ads";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Feather from "@expo/vector-icons/Feather";
+// import FontAwesome from "@expo/vector-icons/FontAwesome";
+// import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface FilteredCountry {
@@ -310,21 +309,19 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   useEffect(() => {
     const unsubscribe = rewardedInterstatial.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
-      Alert.alert("Load rewardedInterstatial");
     });
     const unsubscribeClose = rewardedInterstatial.addAdEventListener(AdEventType.CLOSED, () => {
       setLoadedAdvertisement(false);
-      Alert.alert(`Close interstitial`);
+
       rewardedInterstatial.load();
     });
     const unsubscribeEarned = rewardedInterstatial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
       setTimeout(() => {
         setHints(reward.amount);
-        Alert.alert(`Получена награда: ${reward.amount} ${reward.type}`);
       }, 100);
     });
     const unsubscribeError = rewardedInterstatial.addAdEventListener(AdEventType.ERROR, (error) => {
-      Alert.alert("Ошибка загрузки рекламы", error?.message || "Неизвестная ошибка");
+      console.log("rewardedInterstatial", error.message);
     });
     rewardedInterstatial.load();
     return () => {
@@ -334,9 +331,6 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       unsubscribeError();
     };
   }, []);
-  useEffect(() => {
-    if (education) setSeconds(3600);
-  }, [education]);
 
   return (
     <LinearGradient
@@ -345,82 +339,78 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       end={{ x: 1.0, y: 1.0 }}
       style={{ height: "100%", width: "100%", padding: 10, paddingTop: "10%" }}
     >
-      {education ? (
-        <Study countryFilteredByMainLand={countryFiltered} navigation={navigation}></Study>
-      ) : (
-        <>
-          <BlockStars>
-            <Starts stars={stars} />
-          </BlockStars>
-          <BlockInfo>
-            <BlockInfoText>
-              {t("seconds")} {seconds}
-            </BlockInfoText>
-            <BlockInfoText>
-              {t("mistakes")} {mistakes}
-            </BlockInfoText>
-          </BlockInfo>
-          <BlockInfo>
-            <BlockInfoText>
-              {t("hints")} {hints}
-            </BlockInfoText>
-            <BlockInfoText>
-              {t("answers")} {answers}
-            </BlockInfoText>
-          </BlockInfo>
-          <BlockInfo style={{ marginTop: 20, position: "relative" }}>
-            <Button
-              fontSize={15}
-              title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`}
-              onPress={() => {
-                if (hints === 0) {
-                  if (loadedAdvertisement) {
-                    rewardedInterstatial.show();
-                  } else {
-                    Alert.alert(`${t("testNonAdv")}`);
-                  }
+      <>
+        <BlockStars>
+          <Starts stars={stars} />
+        </BlockStars>
+        <BlockInfo>
+          <BlockInfoText>
+            {t("seconds")} {seconds}
+          </BlockInfoText>
+          <BlockInfoText>
+            {t("mistakes")} {mistakes}
+          </BlockInfoText>
+        </BlockInfo>
+        <BlockInfo>
+          <BlockInfoText>
+            {t("hints")} {hints}
+          </BlockInfoText>
+          <BlockInfoText>
+            {t("answers")} {answers}
+          </BlockInfoText>
+        </BlockInfo>
+        <BlockInfo style={{ marginTop: 20, position: "relative" }}>
+          <Button
+            fontSize={15}
+            title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`}
+            onPress={() => {
+              if (hints === 0) {
+                if (loadedAdvertisement) {
+                  rewardedInterstatial.show();
                 } else {
-                  takeHint();
+                  Alert.alert(`${t("testNonAdv")}`);
                 }
-              }}
-            />
-            <BlokcMusic>
-              <ButtonSound onPress={() => navigation.navigate("LanguageScreen")}>
-                <MaterialIcons name="language" size={30} color="gold" />
-              </ButtonSound>
-            </BlokcMusic>
-          </BlockInfo>
-          <BlockQuestion>
-            <BlockInfoText>{t("testQuestion")}</BlockInfoText>
-            <BlockInfoText>{t(firstElement)}:</BlockInfoText>
-            {firstElement === "flag" ? (
-              <BlockFlag source={{ uri: question?.question }}></BlockFlag>
-            ) : (
-              <BlockInfoText style={{ marginTop: 10, fontSize: 30 }}>{question?.question}</BlockInfoText>
-            )}
-          </BlockQuestion>
-          <BlockInfoText>{t(secondElement)}:</BlockInfoText>
-          <BlockAnswers>
-            {questionLoaded &&
-              question!.options.map((option, i) => {
-                if (hiddenOptions.includes(option)) return null;
-                const displayText = option;
-                if (secondElement === "flag") {
-                  return (
-                    <AnswerButton onPress={() => checkAnswer(option)} key={i}>
-                      <AnswerFlag source={{ uri: option }} />
-                    </AnswerButton>
-                  );
-                }
+              } else {
+                takeHint();
+              }
+            }}
+          />
+          <BlokcMusic>
+            <ButtonSound onPress={() => navigation.replace("LanguageScreen")}>
+              <MaterialIcons name="language" size={30} color="gold" />
+            </ButtonSound>
+          </BlokcMusic>
+        </BlockInfo>
+        <BlockQuestion>
+          <BlockInfoText>{t("testQuestion")}</BlockInfoText>
+          <BlockInfoText>{t(firstElement)}:</BlockInfoText>
+          {firstElement === "flag" ? (
+            <BlockFlag source={{ uri: question?.question }}></BlockFlag>
+          ) : (
+            <BlockInfoText style={{ marginTop: 10, fontSize: 30 }}>{question?.question}</BlockInfoText>
+          )}
+        </BlockQuestion>
+        <BlockInfoText>{t(secondElement)}:</BlockInfoText>
+        <BlockAnswers>
+          {questionLoaded &&
+            question!.options.map((option, i) => {
+              if (hiddenOptions.includes(option)) return null;
+              const displayText = option;
+              if (secondElement === "flag") {
                 return (
                   <AnswerButton onPress={() => checkAnswer(option)} key={i}>
-                    <AnswerText>{displayText}</AnswerText>
+                    <AnswerFlag source={{ uri: option }} />
                   </AnswerButton>
                 );
-              })}
-          </BlockAnswers>
-        </>
-      )}
+              }
+              return (
+                <AnswerButton onPress={() => checkAnswer(option)} key={i}>
+                  <AnswerText>{displayText}</AnswerText>
+                </AnswerButton>
+              );
+            })}
+        </BlockAnswers>
+      </>
       <BlockBanner>
         <BannerAd
           unitId={TestIds.ADAPTIVE_BANNER}

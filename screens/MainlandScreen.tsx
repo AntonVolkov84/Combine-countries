@@ -55,6 +55,7 @@ const BlockButtonImage = styled.Image`
 export default function MainlandScreen({ route, navigation }: MainlandScreenProps) {
   const [superLevelVisible, setSuperLevelVisible] = useState<boolean>(false);
   const { t } = useTranslation();
+
   const data = [
     {
       uri: Africa,
@@ -104,7 +105,9 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
         {superLevelVisible ? (
           <BlockButton
             onPress={() => {
-              navigation.navigate("TestScreen", { ...route.params, mainland: "All world" });
+              route.params.education
+                ? navigation.navigate("StudyScreen", { ...route.params, mainland: "All world" })
+                : navigation.navigate("TestScreen", { ...route.params, mainland: "All world" });
             }}
           >
             <BlockButtonImage source={Super}></BlockButtonImage>
@@ -115,7 +118,9 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
             {data.map((e) => (
               <BlockButton
                 onPress={() => {
-                  navigation.navigate("TestScreen", { ...route.params, mainland: e.mainland });
+                  route.params.education
+                    ? navigation.navigate("StudyScreen", { ...route.params, mainland: e.mainland })
+                    : navigation.navigate("TestScreen", { ...route.params, mainland: e.mainland });
                 }}
                 key={e.text}
               >

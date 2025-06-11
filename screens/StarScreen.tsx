@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
-type StartScreenProps = NativeStackScreenProps<RootStackParamList, "ConditionsScreen">;
+type StartScreenProps = NativeStackScreenProps<RootStackParamList, "StarScreen">;
 import Button from "../components/Button";
 import { useTranslation } from "react-i18next";
 import LottieView from "lottie-react-native";
