@@ -36,7 +36,7 @@ export default function StarScreen({ navigation }: StartScreenProps) {
         }}
         source={require("../Animation.json")}
       />
-      <Button onPress={() => navigation.navigate("ConditionsScreen")} title={t("tomenu")} />
+      <Button onPress={() => navigation.replace("ConditionsScreen")} title={t("tomenu")} />
     </LinearGradient>
   );
 }

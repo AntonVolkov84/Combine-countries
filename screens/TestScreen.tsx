@@ -176,19 +176,15 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   };
 
   const incrementMistakes = (): void => {
-    if (mistakes === 2) {
+    if (mistakes === 3) {
       decrementStars();
-      Alert.alert(`${t("testalertMistakes")}`);
-      setMistakes(0);
-      return navigation.navigate("ConditionsScreen");
+    } else {
+      setMistakes(mistakes + 1);
     }
-    setMistakes(mistakes + 1);
   };
   const incrementAnswers = (): void => {
     if (answers === 9) {
       incrementStars();
-      setAnswers(0);
-      return navigation.replace("StarScreen");
     }
     setAnswers(answers + 1);
   };
@@ -271,6 +267,26 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   };
 
   useEffect(() => {
+    if (mistakes === 3) {
+      setMistakes(0);
+      Alert.alert(`${t("testalertMistakes")}`);
+      decrementStars();
+      setTimeout(() => {
+        navigation.replace("ConditionsScreen");
+      }, 0);
+    }
+  }, [mistakes]);
+
+  useEffect(() => {
+    if (answers === 10) {
+      setAnswers(0);
+      setTimeout(() => {
+        navigation.replace("StarScreen");
+      }, 0);
+    }
+  }, [answers]);
+
+  useEffect(() => {
     async function fetchStars() {
       const saved = await getSavedPlayersStars("stars");
       setStars(saved ? Number(saved) : 0);
@@ -292,7 +308,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
           console.log("⏱️ Таймер дошёл до 0 и остановлен");
 
           Alert.alert(`${t("timerAlert")}`);
-          navigation.navigate("MainlandScreen", route.params);
+          navigation.replace("MainlandScreen", route.params);
 
           return 0;
         }

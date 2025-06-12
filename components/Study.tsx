@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import { useTranslation } from "react-i18next";
-import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 // import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -64,12 +64,7 @@ const BlokcMusic = styled.View`
 `;
 
 const ButtonSound = styled.TouchableOpacity``;
-const BlockBanner = styled.View`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
+
 const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
 });
@@ -81,17 +76,25 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
   const { t } = useTranslation();
 
   useEffect(() => {
+    console.log("Study mountain");
+    return () => console.log("Study UNmountain");
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
       setLoadedAdvertisement(true);
-      console.log("Loaded");
     });
     const unsubscribeError = interstatial.addAdEventListener(AdEventType.ERROR, (err) => {
       console.log("Interstitial error", err);
+    });
+    const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
+      navigation.navigate("ConditionsScreen");
     });
     interstatial.load();
     return (): void => {
       unsubscribe();
       unsubscribeError();
+      unsubscribeClose();
     };
   }, []);
   useEffect(() => {
@@ -116,9 +119,7 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
         <BlokcMusic>
           <ButtonSound
             onPress={() => {
-              requestAnimationFrame(() => {
-                navigation.navigate("LanguageScreen");
-              });
+              navigation.navigate("LanguageScreen");
             }}
           >
             <MaterialIcons name="language" size={30} color="gold" />
@@ -136,29 +137,9 @@ export default function Study({ countryFilteredByMainLand, navigation }: StudyPr
       <Button
         title={t("tomenu")}
         onPress={() => {
-          if (loadedAdvertisement) {
-            const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
-              navigation.navigate("ConditionsScreen");
-              interstatial.removeAllListeners();
-            });
-            interstatial.show();
-          } else {
-            navigation.navigate("ConditionsScreen");
-          }
+          interstatial.show();
         }}
       ></Button>
-      <BlockBanner>
-        <BannerAd
-          unitId={TestIds.ADAPTIVE_BANNER}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: true,
-            networkExtras: {
-              collapsible: "bottom",
-            },
-          }}
-        />
-      </BlockBanner>
     </>
   );
 }
