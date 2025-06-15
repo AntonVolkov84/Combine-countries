@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import styled from "styled-components";
 import Button from "../components/Button";
 import { useState, useEffect, useRef } from "react";
@@ -9,10 +9,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdEventType, InterstitialAd, TestIds, BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import countries_en from "../Countries_en.json";
 import countries_ua from "../Countries_ua.json";
+import { useIsFocused } from "@react-navigation/native";
 import i18next from "../i18next";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 // import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Banner from "../components/Banner";
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "StudyScreen">;
 
 interface FilteredCountry {
@@ -64,10 +66,6 @@ const BlokcMusic = styled.View`
 
 const ButtonSound = styled.TouchableOpacity``;
 
-const interstatial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-  requestNonPersonalizedAdsOnly: true,
-});
-
 const BlockBanner = styled.View`
   position: absolute;
   left: 0;
@@ -78,31 +76,14 @@ const BlockBanner = styled.View`
 export default function StudyScreen({ route, navigation }: MainlandScreenProps) {
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
-  const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
   const { t } = useTranslation();
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const allWorld = route.params.mainland === "All world";
+
   const countryFilteredByMainLand = allWorld
     ? countries
     : countries.filter((country) => country.continents.includes(route.params.mainland));
 
-  useEffect(() => {
-    const unsubscribe = interstatial.addAdEventListener(AdEventType.LOADED, () => {
-      setLoadedAdvertisement(true);
-    });
-    const unsubscribeError = interstatial.addAdEventListener(AdEventType.ERROR, (err) => {
-      console.log("Interstitial error", err);
-    });
-    const unsubscribeClose = interstatial.addAdEventListener(AdEventType.CLOSED, () => {
-      navigation.replace("ConditionsScreen");
-    });
-    interstatial.load();
-    return (): void => {
-      unsubscribe();
-      unsubscribeError();
-      unsubscribeClose();
-    };
-  }, []);
   useEffect(() => {
     setItem(countryFilteredByMainLand[itemIndex]);
   }, [itemIndex]);
@@ -145,23 +126,9 @@ export default function StudyScreen({ route, navigation }: MainlandScreenProps) 
         <Button title={t("back")} onPress={() => decrementIndex()}></Button>
         <Button title={t("next")} onPress={() => incrementIndex()}></Button>
       </BlockBtn>
-      <Button
-        title={t("tomenu")}
-        onPress={() => {
-          loadedAdvertisement ? interstatial.show() : navigation.replace("ConditionsScreen");
-        }}
-      ></Button>
+      <Button title={t("tomenu")} onPress={() => navigation.replace("ConditionsScreen")}></Button>
       <BlockBanner>
-        <BannerAd
-          unitId={TestIds.ADAPTIVE_BANNER}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: true,
-            networkExtras: {
-              collapsible: "bottom",
-            },
-          }}
-        />
+        <Banner />
       </BlockBanner>
     </LinearGradient>
   );

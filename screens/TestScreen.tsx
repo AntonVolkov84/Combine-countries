@@ -8,9 +8,10 @@ import countries_en from "../Countries_en.json";
 import countries_ua from "../Countries_ua.json";
 import i18next from "../i18next";
 import * as SecureStore from "expo-secure-store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
 import Starts from "../components/Starts";
+import Banner from "../components/Banner";
 import {
   AdEventType,
   BannerAd,
@@ -149,6 +150,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const [loadedAdvertisement, setLoadedAdvertisement] = useState<boolean>(false);
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const { t } = useTranslation();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const allWorld = route.params.mainland === "All world";
   const firstElement = route.params.params?.firstElement;
   const secondElement = route.params.params?.secondElement;
@@ -268,21 +270,17 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
 
   useEffect(() => {
     if (mistakes === 3) {
-      setMistakes(0);
       Alert.alert(`${t("testalertMistakes")}`);
+      setMistakes(0);
       decrementStars();
-      setTimeout(() => {
-        navigation.replace("ConditionsScreen");
-      }, 0);
+      navigation.replace("ConditionsScreen");
     }
   }, [mistakes]);
 
   useEffect(() => {
-    if (answers === 10) {
+    if (answers >= 10) {
       setAnswers(0);
-      setTimeout(() => {
-        navigation.replace("StarScreen");
-      }, 0);
+      navigation.replace("StarScreen");
     }
   }, [answers]);
 
@@ -301,26 +299,31 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (timerRef.current) return;
+    timerRef.current = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
-          console.log("⏱️ Таймер дошёл до 0 и остановлен");
-
-          Alert.alert(`${t("timerAlert")}`);
-          navigation.replace("MainlandScreen", route.params);
-
+          clearInterval(timerRef.current!);
+          timerRef.current = null;
           return 0;
         }
-
         return prev - 1;
       });
     }, 1000);
 
     return () => {
-      clearInterval(interval);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (seconds === 0) {
+      navigation.replace("MainlandScreen", route.params);
+    }
+  }, [seconds]);
 
   useEffect(() => {
     const unsubscribe = rewardedInterstatial.addAdEventListener(RewardedAdEventType.LOADED, () => {
@@ -428,16 +431,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
         </BlockAnswers>
       </>
       <BlockBanner>
-        <BannerAd
-          unitId={TestIds.ADAPTIVE_BANNER}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: true,
-            networkExtras: {
-              collapsible: "bottom",
-            },
-          }}
-        />
+        <Banner />
       </BlockBanner>
     </LinearGradient>
   );
