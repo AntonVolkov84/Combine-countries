@@ -14,6 +14,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import { RootStackParamList } from "./navigationtypes";
 import { AdsConsent, AdsConsentStatus, MobileAds, MaxAdContentRating } from "react-native-google-mobile-ads";
 import { Audio } from "expo-av";
+import { SoundContext } from "./Soundcontext";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -25,7 +26,7 @@ export default function App() {
     await NavigationBar.setButtonStyleAsync("light");
   };
   const playSound = async () => {
-    const { sound } = await Audio.Sound.createAsync(require("./assets/miami.mp3"), { isLooping: true, volume: 0.6 });
+    const { sound } = await Audio.Sound.createAsync(require("./assets/miami.mp3"), { isLooping: true, volume: 0.9 });
     soundRef.current = sound;
     await sound.playAsync();
   };
@@ -56,73 +57,75 @@ export default function App() {
     requestConsentInfo();
   }, []);
   return (
-    <NavigationContainer>
-      <StatusBar style="light" />
-      <Stack.Navigator initialRouteName="StartScreen">
-        <Stack.Screen
-          name="StartScreen"
-          component={StartScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="LanguageScreen"
-          component={LanguageScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="RuleScreen"
-          component={RuleScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="ConditionsScreen"
-          component={ConditionsScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="MainlandScreen"
-          component={MainlandScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="TestScreen"
-          component={TestScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="StarScreen"
-          component={StarScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-        <Stack.Screen
-          name="StudyScreen"
-          component={StudyScreen}
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SoundContext.Provider value={{ playSound, soundRef, soundPaused, setSoundPaused }}>
+      <NavigationContainer>
+        <StatusBar style="light" />
+        <Stack.Navigator initialRouteName="StartScreen">
+          <Stack.Screen
+            name="StartScreen"
+            component={StartScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="LanguageScreen"
+            component={LanguageScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="RuleScreen"
+            component={RuleScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="ConditionsScreen"
+            component={ConditionsScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="MainlandScreen"
+            component={MainlandScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="TestScreen"
+            component={TestScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="StarScreen"
+            component={StarScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+          <Stack.Screen
+            name="StudyScreen"
+            component={StudyScreen}
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SoundContext.Provider>
   );
 }

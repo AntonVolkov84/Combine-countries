@@ -12,8 +12,9 @@ import Button from "../components/Button";
 import Starts from "../components/Starts";
 import Banner from "../components/Banner";
 import { AdEventType, RewardedInterstitialAd, RewardedAdEventType, TestIds } from "react-native-google-mobile-ads";
-// import FontAwesome from "@expo/vector-icons/FontAwesome";
-// import Feather from "@expo/vector-icons/Feather";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Feather from "@expo/vector-icons/Feather";
+import { useSoundContext } from "../Soundcontext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const screenWidth = Dimensions.get("window").width;
@@ -64,6 +65,7 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const { t } = useTranslation();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { playSound, soundPaused, setSoundPaused, soundRef } = useSoundContext();
   const allWorld = route.params.mainland === "All world";
   const firstElement = route.params.params?.firstElement;
   const secondElement = route.params.params?.secondElement;
@@ -179,7 +181,16 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
     setHiddenOptions([]);
     return handleNextQuestion();
   };
-
+  useEffect(() => {
+    playSound();
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.pauseAsync().catch((e) => {
+          console.warn("Failed to pause sound:", e);
+        });
+      }
+    };
+  }, []);
   useEffect(() => {
     if (mistakes === 3) {
       Alert.alert(`${t("testalertMistakes")}`);
@@ -312,6 +323,29 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
             <TouchableOpacity style={styles.buttonSound} onPress={() => navigation.replace("LanguageScreen")}>
               <MaterialIcons name="language" size={30} color="gold" />
             </TouchableOpacity>
+            {!soundPaused ? (
+              <TouchableOpacity
+                onPress={async () => {
+                  if (soundRef.current) {
+                    await soundRef.current.pauseAsync();
+                    setSoundPaused(true);
+                  }
+                }}
+              >
+                <Feather name="pause-circle" size={30} color="gold" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={async () => {
+                  if (soundRef.current) {
+                    await soundRef.current.playAsync();
+                    setSoundPaused(false);
+                  }
+                }}
+              >
+                <FontAwesome name="play-circle-o" size={30} color="gold" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         <View style={styles.blockQuestion}>

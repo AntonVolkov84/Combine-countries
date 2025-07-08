@@ -10,6 +10,9 @@ import countries_en from "../Countries_en.json";
 import countries_ua from "../Countries_ua.json";
 import i18next from "../i18next";
 import Banner from "../components/Banner";
+import { useSoundContext } from "../Soundcontext";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Feather from "@expo/vector-icons/Feather";
 const screenWidth = Dimensions.get("window").width;
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "StudyScreen">;
 
@@ -30,13 +33,24 @@ export default function StudyScreen({ route, navigation }: MainlandScreenProps) 
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
   const { t } = useTranslation();
+  const { playSound, soundPaused, setSoundPaused, soundRef } = useSoundContext();
+
   const countries = i18next.language === "ua" ? countries_ua : countries_en;
   const allWorld = route.params.mainland === "All world";
 
   const countryFilteredByMainLand = allWorld
     ? countries
     : countries.filter((country) => country.continents.includes(route.params.mainland));
-
+  useEffect(() => {
+    playSound();
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.pauseAsync().catch((e) => {
+          console.warn("Failed to pause sound:", e);
+        });
+      }
+    };
+  }, []);
   useEffect(() => {
     setItem(countryFilteredByMainLand[itemIndex]);
   }, [itemIndex]);
@@ -67,6 +81,29 @@ export default function StudyScreen({ route, navigation }: MainlandScreenProps) 
           <TouchableOpacity onPress={() => navigation.replace("LanguageScreen")}>
             <MaterialIcons name="language" size={30} color="gold" />
           </TouchableOpacity>
+          {!soundPaused ? (
+            <TouchableOpacity
+              onPress={async () => {
+                if (soundRef.current) {
+                  await soundRef.current.pauseAsync();
+                  setSoundPaused(true);
+                }
+              }}
+            >
+              <Feather name="pause-circle" size={30} color="gold" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={async () => {
+                if (soundRef.current) {
+                  await soundRef.current.playAsync();
+                  setSoundPaused(false);
+                }
+              }}
+            >
+              <FontAwesome name="play-circle-o" size={30} color="gold" />
+            </TouchableOpacity>
+          )}
         </View>
         <Image source={{ uri: item?.flags.png }} style={styles.infoIcon} />
         <Text style={styles.infoText}>{`${t("country")}: ${item?.name.common}`}</Text>
