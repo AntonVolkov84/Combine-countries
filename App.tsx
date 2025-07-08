@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import StartScreen from "./screens/StartScreen";
@@ -13,13 +13,21 @@ import StudyScreen from "./screens/StudyScreen";
 import * as NavigationBar from "expo-navigation-bar";
 import { RootStackParamList } from "./navigationtypes";
 import { AdsConsent, AdsConsentStatus, MobileAds, MaxAdContentRating } from "react-native-google-mobile-ads";
+import { Audio } from "expo-av";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const [soundPaused, setSoundPaused] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
   const customNavigationBar = async () => {
     await NavigationBar.setBackgroundColorAsync("#1E2322");
     await NavigationBar.setButtonStyleAsync("light");
+  };
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require("./assets/miami.mp3"), { isLooping: true, volume: 0.6 });
+    soundRef.current = sound;
+    await sound.playAsync();
   };
   useEffect(() => {
     customNavigationBar();
