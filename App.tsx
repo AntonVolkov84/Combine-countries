@@ -1,6 +1,5 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import StartScreen from "./screens/StartScreen";
@@ -13,6 +12,7 @@ import StarScreen from "./screens/StarScreen";
 import StudyScreen from "./screens/StudyScreen";
 import * as NavigationBar from "expo-navigation-bar";
 import { RootStackParamList } from "./navigationtypes";
+import { AdsConsent, AdsConsentStatus, MobileAds, MaxAdContentRating } from "react-native-google-mobile-ads";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -23,6 +23,29 @@ export default function App() {
   };
   useEffect(() => {
     customNavigationBar();
+  }, []);
+  useEffect(() => {
+    const requestConsentInfo = async () => {
+      try {
+        await MobileAds().initialize();
+        await AdsConsent.requestInfoUpdate();
+        await AdsConsent.loadAndShowConsentFormIfRequired();
+        const consentStatus = await AdsConsent.gatherConsent();
+        if (consentStatus.status === AdsConsentStatus.OBTAINED) {
+          console.log("User gave consent!");
+        } else if (consentStatus.status === AdsConsentStatus.REQUIRED) {
+          console.log("Consent is still required.");
+        }
+        await MobileAds().setRequestConfiguration({
+          tagForChildDirectedTreatment: true,
+          tagForUnderAgeOfConsent: true,
+          maxAdContentRating: MaxAdContentRating.G,
+        });
+      } catch (error) {
+        console.warn("Consent error:", error);
+      }
+    };
+    requestConsentInfo();
   }, []);
   return (
     <NavigationContainer>

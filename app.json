@@ -29,6 +29,9 @@
       "expo-secure-store"
     ],
     "android": {
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "buildToolsVersion": "35.0.0",
       "adaptiveIcon": {
         "foregroundImage": "./assets/supericon.png",
         "backgroundColor": "#ffffff"

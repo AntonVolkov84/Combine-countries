@@ -4,6 +4,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
 import * as SecureStore from "expo-secure-store";
 import i18next from "../i18next";
+import { AdsConsent } from "react-native-google-mobile-ads";
+import { useTranslation } from "react-i18next";
 
 type StartScreenProps = NativeStackScreenProps<RootStackParamList, "LanguageScreen">;
 
@@ -12,12 +14,23 @@ function savePlayerLanguage(key: string, value: string): Promise<void> {
 }
 
 export default function LanguageScreen({ navigation }: StartScreenProps) {
+  const { t } = useTranslation();
   const changeLanguage = async (lng: string): Promise<void> => {
     await savePlayerLanguage("lng", lng);
     await i18next.changeLanguage(lng);
     requestAnimationFrame(() => {
       navigation.replace("RuleScreen");
     });
+  };
+  const showConsentFormForce = async () => {
+    try {
+      await AdsConsent.reset();
+      await AdsConsent.requestInfoUpdate();
+      await AdsConsent.gatherConsent();
+      await AdsConsent.showPrivacyOptionsForm();
+    } catch (error) {
+      console.warn("Error forcing privacy options form show:", error);
+    }
   };
 
   return (
@@ -39,6 +52,9 @@ export default function LanguageScreen({ navigation }: StartScreenProps) {
           <Text style={styles.languageText}>English</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity style={styles.requestAdsButton} onPress={showConsentFormForce}>
+        <Text style={[styles.buttonText, { textAlign: "center" }]}>{t("requestads")}</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }
@@ -61,5 +77,13 @@ const styles = StyleSheet.create({
     color: "whitesmoke",
     fontSize: 20,
     textAlign: "center",
+  },
+  buttonText: {
+    color: "whitesmoke",
+    fontSize: 15,
+  },
+
+  requestAdsButton: {
+    marginBottom: 60,
   },
 });
