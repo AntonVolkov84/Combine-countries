@@ -1,20 +1,16 @@
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
-import styled from "styled-components";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import Button from "../components/Button";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { RootStackParamList } from "../navigationtypes";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AdEventType, InterstitialAd, TestIds, BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import countries_en from "../Countries_en.json";
 import countries_ua from "../Countries_ua.json";
-import { useIsFocused } from "@react-navigation/native";
 import i18next from "../i18next";
-// import FontAwesome from "@expo/vector-icons/FontAwesome";
-// import Feather from "@expo/vector-icons/Feather";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Banner from "../components/Banner";
+const screenWidth = Dimensions.get("window").width;
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "StudyScreen">;
 
 interface FilteredCountry {
@@ -30,49 +26,6 @@ interface FilteredCountry {
   continents: string;
 }
 
-const BlockInfo = styled.View`
-  flex-direction: column;
-  margin: 15px auto;
-  width: 360px;
-  height: 450px;
-  justify-content: space-around;
-  align-items: center;
-  padding-top: 10px;
-  position: relative;
-`;
-const BlockBtn = styled.View`
-  flex-direction: row;
-  margin-bottom: 50px;
-`;
-const InfoIcon = styled.Image`
-  width: 200px;
-  aspect-ratio: 1;
-  border-radius: 10px;
-  object-fit: contain;
-`;
-const InfoText = styled.Text`
-  color: whitesmoke;
-  font-size: 20px;
-  text-align: center;
-`;
-const BlokcMusic = styled.View`
-  position: absolute;
-  flex-direction: row;
-  gap: 20px;
-  width: 100px;
-  justify-content: center;
-  z-index: 2;
-`;
-
-const ButtonSound = styled.TouchableOpacity``;
-
-const BlockBanner = styled.View`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
-
 export default function StudyScreen({ route, navigation }: MainlandScreenProps) {
   const [item, setItem] = useState<FilteredCountry | null>(null);
   const [itemIndex, setItemIndex] = useState<number>(0);
@@ -87,6 +40,7 @@ export default function StudyScreen({ route, navigation }: MainlandScreenProps) 
   useEffect(() => {
     setItem(countryFilteredByMainLand[itemIndex]);
   }, [itemIndex]);
+
   const incrementIndex = (): void => {
     if (itemIndex === countryFilteredByMainLand.length - 1) {
       return setItemIndex(0);
@@ -100,46 +54,88 @@ export default function StudyScreen({ route, navigation }: MainlandScreenProps) 
     }
     setItemIndex(itemIndex - 1);
   };
+
   return (
     <LinearGradient
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}
       start={{ x: 0.0, y: 0.0 }}
       end={{ x: 1.0, y: 1.0 }}
-      style={{ height: "100%", width: "100%", padding: 10, paddingTop: "10%" }}
+      style={styles.container}
     >
-      <BlockInfo>
-        <BlokcMusic>
-          <ButtonSound
-            onPress={() => {
-              navigation.replace("LanguageScreen");
-            }}
-          >
+      <View style={styles.blockInfo}>
+        <View style={styles.blockMusic}>
+          <TouchableOpacity onPress={() => navigation.replace("LanguageScreen")}>
             <MaterialIcons name="language" size={30} color="gold" />
-          </ButtonSound>
-        </BlokcMusic>
-        <InfoIcon source={{ uri: item?.flags.png }}></InfoIcon>
-        <InfoText>{`${t("country")}: ${item?.name.common}`}</InfoText>
-        <InfoText>{`${t("countryOficial")}: ${item?.name.official}`}</InfoText>
-        <InfoText>{`${t("capital")}: ${item?.capital[0]}`}</InfoText>
-      </BlockInfo>
-      <BlockBtn>
-        <Button title={t("back")} onPress={() => decrementIndex()}></Button>
-        <Button title={t("next")} onPress={() => incrementIndex()}></Button>
-      </BlockBtn>
-      <Button title={t("tomenu")} onPress={() => navigation.replace("ConditionsScreen")}></Button>
-      <BlockBanner>
+          </TouchableOpacity>
+        </View>
+        <Image source={{ uri: item?.flags.png }} style={styles.infoIcon} />
+        <Text style={styles.infoText}>{`${t("country")}: ${item?.name.common}`}</Text>
+        <Text style={styles.infoText}>{`${t("countryOficial")}: ${item?.name.official}`}</Text>
+        <Text style={styles.infoText}>{`${t("capital")}: ${item?.capital[0]}`}</Text>
+      </View>
+      <View style={styles.blockBtn}>
+        <Button title={t("back")} onPress={decrementIndex} />
+        <Button title={t("next")} onPress={incrementIndex} />
+      </View>
+      <Button title={t("tomenu")} onPress={() => navigation.replace("ConditionsScreen")} />
+      <View style={styles.blockBanner}>
         <Banner />
-      </BlockBanner>
+      </View>
     </LinearGradient>
   );
 }
 
-// {player.playing ? (
-//             <ButtonSound onPress={() => player.pause()}>
-//               <Feather name="pause-circle" size={30} color="gold" />
-//             </ButtonSound>
-//           ) : (
-//             <ButtonSound onPress={() => player.play()}>
-//               <FontAwesome name="play-circle-o" size={30} color="gold" />
-//             </ButtonSound>
-//           )}
+const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+    width: "100%",
+    padding: 10,
+    paddingTop: "10%",
+  },
+  blockInfo: {
+    flexDirection: "column",
+    marginHorizontal: "auto",
+    width: 360,
+    height: 450,
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingTop: 10,
+    position: "relative",
+  },
+  blockBtn: {
+    flexDirection: "row",
+    marginBottom: 50,
+    justifyContent: "space-between",
+    gap: 20,
+  },
+  infoIcon: {
+    width: 200,
+    aspectRatio: 1,
+    borderRadius: 10,
+    resizeMode: "contain",
+  },
+  infoText: {
+    color: "whitesmoke",
+    fontSize: 20,
+    textAlign: "center",
+  },
+  blockMusic: {
+    position: "absolute",
+    flexDirection: "row",
+    gap: 20,
+    width: 100,
+    justifyContent: "center",
+    zIndex: 2,
+    top: 0,
+  },
+  blockBanner: {
+    position: "absolute",
+    bottom: 0,
+    width: screenWidth,
+    backgroundColor: "#1E1E1E",
+    alignItems: "center",
+    paddingVertical: 4,
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+  },
+});

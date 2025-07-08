@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import Europe from "../assets/Eurasia.png";
 import NorthAmerica from "../assets/NorthAmerica.png";
@@ -11,46 +10,13 @@ import Africa from "../assets/Africa.png";
 import Asia from "../assets/Asia.png";
 import Super from "../assets/supericon.png";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "MainlandScreen">;
 
 function getSavedPlayersStars(key: string): Promise<string | null> {
   return SecureStore.getItemAsync(key);
 }
-
-const MainScreenInfoText = styled.Text`
-  color: whitesmoke;
-  font-size: 20px;
-  text-align: center;
-`;
-const Block = styled.View`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 25px;
-  flex-wrap: wrap;
-`;
-const BlockButton = styled.TouchableOpacity`
-  width: 48%;
-  aspect-ratio: 1;
-  border-radius: 10px;
-  padding: 5px;
-  align-items: center;
-  margin-bottom: 10px;
-`;
-const BlockButtonText = styled.Text`
-  text-align: center;
-  color: whitesmoke;
-  font-size: 20px;
-  margin-top: 5px;
-`;
-const BlockButtonImage = styled.Image`
-  aspect-ratio: 1;
-  object-fit: cover;
-  height: 150px;
-  border-radius: 10px;
-`;
 
 export default function MainlandScreen({ route, navigation }: MainlandScreenProps) {
   const [superLevelVisible, setSuperLevelVisible] = useState<boolean>(false);
@@ -83,40 +49,45 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
       mainland: "Asia",
     },
   ];
+
   const checkStarForSuperLevel = async (): Promise<void> => {
     const starsForSuperLevel = await getSavedPlayersStars("stars");
+    console.log(starsForSuperLevel);
     if (Number(starsForSuperLevel) >= 4) {
       setSuperLevelVisible(true);
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     checkStarForSuperLevel();
   }, []);
+
   return (
     <LinearGradient
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}
       start={{ x: 0.0, y: 0.0 }}
       end={{ x: 1.0, y: 1.0 }}
-      style={{ height: "100%", width: "100%", padding: 10, paddingTop: "10%" }}
+      style={{ flex: 1, width: "100%", padding: 10, paddingTop: "10%" }}
     >
-      <MainScreenInfoText>{t("mainlandInfo")}</MainScreenInfoText>
-      <Block>
+      <Text style={styles.mainScreenInfoText}>{t("mainlandInfo")}</Text>
+      <View style={styles.block}>
         {superLevelVisible ? (
-          <BlockButton
+          <TouchableOpacity
+            style={styles.blockButton}
             onPress={() => {
               route.params.education
                 ? navigation.navigate("StudyScreen", { ...route.params, mainland: "All world" })
                 : navigation.navigate("TestScreen", { ...route.params, mainland: "All world" });
             }}
           >
-            <BlockButtonImage source={Super}></BlockButtonImage>
-            <BlockButtonText>{t("allworld")}</BlockButtonText>
-          </BlockButton>
+            <Image source={Super} style={styles.blockButtonImage} />
+            <Text style={styles.blockButtonText}>{t("allworld")}</Text>
+          </TouchableOpacity>
         ) : (
           <>
             {data.map((e) => (
-              <BlockButton
+              <TouchableOpacity
+                style={styles.blockButton}
                 onPress={() => {
                   route.params.education
                     ? navigation.navigate("StudyScreen", { ...route.params, mainland: e.mainland })
@@ -124,13 +95,48 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
                 }}
                 key={e.text}
               >
-                <BlockButtonImage source={e.uri}></BlockButtonImage>
-                <BlockButtonText>{t(e.text)}</BlockButtonText>
-              </BlockButton>
+                <Image source={e.uri} style={styles.blockButtonImage} />
+                <Text style={styles.blockButtonText}>{t(e.text)}</Text>
+              </TouchableOpacity>
             ))}
           </>
         )}
-      </Block>
+      </View>
     </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  mainScreenInfoText: {
+    color: "whitesmoke",
+    fontSize: 20,
+    textAlign: "center",
+  },
+  block: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 25,
+    flexWrap: "wrap",
+  },
+  blockButton: {
+    width: "48%",
+    aspectRatio: 1,
+    borderRadius: 10,
+    padding: 5,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  blockButtonText: {
+    textAlign: "center",
+    color: "whitesmoke",
+    fontSize: 20,
+    marginTop: 5,
+  },
+  blockButtonImage: {
+    aspectRatio: 1,
+    height: 150,
+    borderRadius: 10,
+    objectFit: "cover",
+  },
+});

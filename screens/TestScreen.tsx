@@ -1,7 +1,6 @@
-import { View, Text, Alert, Image, TouchableOpacity } from "react-native";
+import { View, Text, Alert, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigationtypes";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import countries_en from "../Countries_en.json";
@@ -12,17 +11,12 @@ import { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
 import Starts from "../components/Starts";
 import Banner from "../components/Banner";
-import {
-  AdEventType,
-  BannerAd,
-  BannerAdSize,
-  RewardedInterstitialAd,
-  RewardedAdEventType,
-  TestIds,
-} from "react-native-google-mobile-ads";
+import { AdEventType, RewardedInterstitialAd, RewardedAdEventType, TestIds } from "react-native-google-mobile-ads";
 // import FontAwesome from "@expo/vector-icons/FontAwesome";
 // import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
+const screenWidth = Dimensions.get("window").width;
 
 interface FilteredCountry {
   flags: {
@@ -57,87 +51,6 @@ const rewardedInterstatial: RewardedInterstitialAd = RewardedInterstitialAd.crea
   }
 );
 
-const BlockStars = styled.View`
-  width: 100%;
-  height: 50px;
-`;
-const BlockInfo = styled.View`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-around;
-  margin-top: 5px;
-  flex-wrap: wrap;
-`;
-const BlockInfoText = styled.Text`
-  text-align: center;
-  color: whitesmoke;
-  font-size: 20px;
-  margin-top: 3px;
-`;
-const BlockQuestion = styled.View`
-  flex-direction: column;
-  width: 100%;
-  height: 170px;
-  margin-top: 10px;
-`;
-const BlockAnswers = styled.View`
-  margin-top: 10px;
-  width: 100%;
-  height: 300px;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
-`;
-const AnswerButton = styled.TouchableOpacity`
-  width: 42%;
-  height: 40%;
-  justify-content: space-around;
-  align-items: center;
-  border-radius: 5px;
-  border-width: 2px;
-  border-color: green;
-  margin-bottom: 20px;
-`;
-const AnswerFlag = styled.Image`
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-`;
-const AnswerText = styled.Text`
-  width: 100%;
-  color: whitesmoke;
-  font-size: 20px;
-  padding: 10px;
-  text-align: center;
-`;
-
-const BlockFlag = styled.Image`
-  height: 100px;
-  width: 150px;
-  margin: 5px auto;
-  object-fit: contain;
-  border-radius: 5px;
-`;
-
-const BlokcMusic = styled.View`
-  position: absolute;
-  flex-direction: row;
-  gap: 20px;
-  width: 100px;
-  justify-content: center;
-  z-index: 2;
-  right: 10px;
-  top: 20%;
-`;
-
-const ButtonSound = styled.TouchableOpacity``;
-const BlockBanner = styled.View`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
-
 export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const [stars, setStars] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(120);
@@ -158,7 +71,6 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
   const countryFiltered = allWorld
     ? countries
     : countries.filter((country) => country.continents.includes(route.params.mainland));
-  const education = route.params.education;
   const incrementStars = async (): Promise<void> => {
     const resultStar = stars + 1;
     if (resultStar > 5) {
@@ -321,7 +233,9 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
 
   useEffect(() => {
     if (seconds === 0) {
-      navigation.replace("MainlandScreen", route.params);
+      Alert.alert(`${t("testalertTimeOff")}`);
+      decrementStars();
+      navigation.replace("ConditionsScreen");
     }
   }, [seconds]);
 
@@ -359,26 +273,26 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
       style={{ height: "100%", width: "100%", padding: 10, paddingTop: "10%" }}
     >
       <>
-        <BlockStars>
+        <View style={styles.blockStars}>
           <Starts stars={stars} />
-        </BlockStars>
-        <BlockInfo>
-          <BlockInfoText>
+        </View>
+        <View style={styles.blockInfo}>
+          <Text style={styles.blockInfoText}>
             {t("seconds")} {seconds}
-          </BlockInfoText>
-          <BlockInfoText>
+          </Text>
+          <Text style={styles.blockInfoText}>
             {t("mistakes")} {mistakes}
-          </BlockInfoText>
-        </BlockInfo>
-        <BlockInfo>
-          <BlockInfoText>
+          </Text>
+        </View>
+        <View style={styles.blockInfo}>
+          <Text style={styles.blockInfoText}>
             {t("hints")} {hints}
-          </BlockInfoText>
-          <BlockInfoText>
+          </Text>
+          <Text style={styles.blockInfoText}>
             {t("answers")} {answers}
-          </BlockInfoText>
-        </BlockInfo>
-        <BlockInfo style={{ marginTop: 20, position: "relative" }}>
+          </Text>
+        </View>
+        <View style={[styles.blockInfo, { marginTop: 20, position: "relative" }]}>
           <Button
             fontSize={15}
             title={hints === 0 ? t("rewardHints") : `${t("hints")} ${hints}`}
@@ -394,45 +308,130 @@ export default function TestScreen({ route, navigation }: MainlandScreenProps) {
               }
             }}
           />
-          <BlokcMusic>
-            <ButtonSound onPress={() => navigation.replace("LanguageScreen")}>
+          <View style={styles.blokcMusic}>
+            <TouchableOpacity style={styles.buttonSound} onPress={() => navigation.replace("LanguageScreen")}>
               <MaterialIcons name="language" size={30} color="gold" />
-            </ButtonSound>
-          </BlokcMusic>
-        </BlockInfo>
-        <BlockQuestion>
-          <BlockInfoText>{t("testQuestion")}</BlockInfoText>
-          <BlockInfoText>{t(firstElement)}:</BlockInfoText>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.blockQuestion}>
+          <Text style={styles.blockInfoText}>{t("testQuestion")}</Text>
+          <Text style={styles.blockInfoText}>{t(firstElement)}:</Text>
           {firstElement === "flag" ? (
-            <BlockFlag source={{ uri: question?.question }}></BlockFlag>
+            <Image style={styles.blockFlag} source={{ uri: question?.question }} />
           ) : (
-            <BlockInfoText style={{ marginTop: 10, fontSize: 30 }}>{question?.question}</BlockInfoText>
+            <Text style={[styles.blockInfoText, { marginTop: 10, fontSize: 30 }]}>{question?.question}</Text>
           )}
-        </BlockQuestion>
-        <BlockInfoText>{t(secondElement)}:</BlockInfoText>
-        <BlockAnswers>
+        </View>
+        <Text style={styles.blockInfoText}>{t(secondElement)}:</Text>
+        <View style={styles.blockAnswers}>
           {questionLoaded &&
             question!.options.map((option, i) => {
               if (hiddenOptions.includes(option)) return null;
               const displayText = option;
               if (secondElement === "flag") {
                 return (
-                  <AnswerButton onPress={() => checkAnswer(option)} key={i}>
-                    <AnswerFlag source={{ uri: option }} />
-                  </AnswerButton>
+                  <TouchableOpacity style={styles.answerButton} onPress={() => checkAnswer(option)} key={i}>
+                    <Image style={styles.answerFlag} source={{ uri: option }} />
+                  </TouchableOpacity>
                 );
               }
               return (
-                <AnswerButton onPress={() => checkAnswer(option)} key={i}>
-                  <AnswerText>{displayText}</AnswerText>
-                </AnswerButton>
+                <TouchableOpacity style={styles.answerButton} onPress={() => checkAnswer(option)} key={i}>
+                  <Text style={styles.answerText}>{displayText}</Text>
+                </TouchableOpacity>
               );
             })}
-        </BlockAnswers>
+        </View>
       </>
-      <BlockBanner>
+      <View style={styles.blockBanner}>
         <Banner />
-      </BlockBanner>
+      </View>
     </LinearGradient>
   );
 }
+const styles = StyleSheet.create({
+  blockStars: {
+    width: "100%",
+    height: 50,
+  },
+  blockInfo: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 5,
+    flexWrap: "wrap",
+  },
+  blockInfoText: {
+    textAlign: "center",
+    color: "whitesmoke",
+    fontSize: 20,
+    marginTop: 3,
+  },
+  blockQuestion: {
+    flexDirection: "column",
+    width: "100%",
+    height: 170,
+    marginTop: 10,
+  },
+  blockAnswers: {
+    marginTop: 10,
+    width: "100%",
+    height: 300,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+  },
+  answerButton: {
+    width: "42%",
+    height: "40%",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "green",
+    marginBottom: 20,
+  },
+  answerFlag: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
+  answerText: {
+    width: "100%",
+    color: "whitesmoke",
+    fontSize: 20,
+    padding: 10,
+    textAlign: "center",
+  },
+  blockFlag: {
+    height: 100,
+    width: 150,
+    marginTop: 5,
+    marginBottom: 5,
+    alignSelf: "center",
+    resizeMode: "contain",
+    borderRadius: 5,
+  },
+  blokcMusic: {
+    position: "absolute",
+    flexDirection: "row",
+    gap: 20,
+    width: 100,
+    justifyContent: "center",
+    zIndex: 2,
+    right: 10,
+    top: "20%",
+  },
+  buttonSound: {},
+  blockBanner: {
+    position: "absolute",
+    bottom: 0,
+    width: screenWidth,
+    backgroundColor: "#1E1E1E",
+    alignItems: "center",
+    paddingVertical: 4,
+    borderTopWidth: 1,
+    borderTopColor: "#333",
+  },
+});

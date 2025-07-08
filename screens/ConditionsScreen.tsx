@@ -1,6 +1,5 @@
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Image, Alert, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import styled from "styled-components";
 import cap from "../assets/cap.png";
 import exam from "../assets/exam.png";
 import flag from "../assets/Flag.png";
@@ -13,60 +12,6 @@ import { useState } from "react";
 import Button from "../components/Button";
 
 type StartScreenProps = NativeStackScreenProps<RootStackParamList, "ConditionsScreen">;
-
-const Block = styled.View`
-  width: 100%;
-  height: 200px;
-  flex-direction: row;
-  justify-content: space-around;
-  margin-top: 25px;
-`;
-const BlockButton = styled.TouchableOpacity`
-  flex-direction: column;
-  height: 100%;
-  width: 50%;
-  border-radius: 10px;
-  padding: 5px;
-  align-items: center;
-`;
-const BlockButtonText = styled.Text`
-  text-align: center;
-  color: whitesmoke;
-  font-size: 20px;
-  margin-top: 5px;
-`;
-const BlockButtonImage = styled.Image`
-  aspect-ratio: 1;
-  object-fit: cover;
-  height: 150px;
-  border-radius: 10px;
-`;
-const Blockinfo = styled.View`
-  flex-direction: column;
-  width: 90%;
-  height: 410px;
-  align-self: center;
-  margin-bottom: 15px;
-`;
-const BlockChoose = styled.View`
-  width: 100%;
-  height: 180px;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-`;
-const BlockIntro = styled.TouchableOpacity<{ selected?: boolean }>`
-  width: 30%;
-  height: 150px;
-  background-color: ${({ selected }) => (selected ? "#307A59" : "green")};
-  flex-direction: column;
-  border: ${({ selected }) => (selected ? "3px solid white" : "none")};
-`;
-const IntroImage = styled.Image`
-  height: 100px;
-  width: 100%;
-  object-fit: cover;
-`;
 
 export default function ConditionsScreen({ navigation }: StartScreenProps) {
   const { t } = useTranslation();
@@ -93,10 +38,11 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
       colors={["#1E2322", "#1F433A", "#1E2322", "#1F433A"]}
       start={{ x: 0.0, y: 0.0 }}
       end={{ x: 1.0, y: 1.0 }}
-      style={{ height: "100%", width: "100%", padding: 10, paddingTop: "10%" }}
+      style={{ flex: 1, width: "100%", padding: 10, paddingTop: "10%" }}
     >
-      <Block>
-        <BlockButton
+      <View style={styles.block}>
+        <TouchableOpacity
+          style={styles.blockButton}
           onPress={() => {
             setTestVisibility(false);
             navigation.navigate("MainlandScreen", {
@@ -104,51 +50,122 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
             });
           }}
         >
-          <BlockButtonImage source={cap}></BlockButtonImage>
-          <BlockButtonText>{t("education")}</BlockButtonText>
-        </BlockButton>
-        <BlockButton onPress={() => setTestVisibility(true)}>
-          <BlockButtonImage source={exam}></BlockButtonImage>
-          <BlockButtonText>{t("tests")}</BlockButtonText>
-        </BlockButton>
-        <BlockButton></BlockButton>
-      </Block>
+          <Image source={cap} style={styles.blockButtonImage} />
+          <Text style={styles.blockButtonText}>{t("education")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.blockButton} onPress={() => setTestVisibility(true)}>
+          <Image source={exam} style={styles.blockButtonImage} />
+          <Text style={styles.blockButtonText}>{t("tests")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.blockButton}></TouchableOpacity>
+      </View>
       {testVisibility && (
         <View style={{ marginBottom: 10 }}>
-          <Blockinfo>
-            <BlockButtonText>{t("conditionsQuestion")}</BlockButtonText>
-            <BlockChoose>
+          <View style={styles.blockinfo}>
+            <Text style={styles.blockButtonText}>{t("conditionsQuestion")}</Text>
+            <View style={styles.blockChoose}>
               {data.map((e) => (
-                <BlockIntro
-                  selected={chooseItem === e.itemText}
+                <TouchableOpacity
+                  style={[
+                    styles.blockIntro,
+                    chooseItem === e.itemText && {
+                      backgroundColor: "#307A59",
+                      borderWidth: 3,
+                      borderColor: "white",
+                      borderStyle: "solid",
+                    },
+                  ]}
                   key={e.itemText}
                   onPress={() => setChooseItem(e.itemText)}
                 >
-                  <IntroImage source={e.itemLogo}></IntroImage>
-                  <BlockButtonText>{t(e.itemText)}</BlockButtonText>
-                </BlockIntro>
+                  <Image source={e.itemLogo} style={styles.introImage} />
+                  <Text style={styles.blockButtonText}>{t(e.itemText)}</Text>
+                </TouchableOpacity>
               ))}
-            </BlockChoose>
-            <BlockButtonText>{t("conditionsQuestionSecond")}</BlockButtonText>
-            <BlockChoose>
+            </View>
+            <Text style={styles.blockButtonText}>{t("conditionsQuestionSecond")}</Text>
+            <View style={styles.blockChoose}>
               {chooseItem &&
                 data
                   .filter((e) => e.itemText !== chooseItem)
                   .map((e) => (
-                    <BlockIntro
-                      selected={chooseItemSecond === e.itemText}
+                    <TouchableOpacity
+                      style={[
+                        styles.blockIntro,
+                        chooseItemSecond === e.itemText && {
+                          backgroundColor: "#307A59",
+                          borderWidth: 3,
+                          borderColor: "white",
+                          borderStyle: "solid",
+                        },
+                      ]}
                       key={e.itemText}
                       onPress={() => setChooseItemSecond(e.itemText)}
                     >
-                      <IntroImage source={e.itemLogo}></IntroImage>
-                      <BlockButtonText>{t(e.itemText)}</BlockButtonText>
-                    </BlockIntro>
+                      <Image source={e.itemLogo} style={styles.introImage} />
+                      <Text style={styles.blockButtonText}>{t(e.itemText)}</Text>
+                    </TouchableOpacity>
                   ))}
-            </BlockChoose>
-          </Blockinfo>
+            </View>
+          </View>
           <Button title={t("next")} onPress={() => handlePickCondition(chooseItem, chooseItemSecond)} />
         </View>
       )}
     </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  block: {
+    width: "100%",
+    height: 200,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 25,
+  },
+  blockButton: {
+    flexDirection: "column",
+    height: "100%",
+    width: "50%",
+    borderRadius: 10,
+    padding: 5,
+    alignItems: "center",
+  },
+  blockButtonText: {
+    textAlign: "center",
+    color: "whitesmoke",
+    fontSize: 20,
+    marginTop: 5,
+  },
+  blockButtonImage: {
+    aspectRatio: 1,
+    objectFit: "cover",
+    height: 150,
+    borderRadius: 10,
+  },
+  blockinfo: {
+    flexDirection: "column",
+    width: "90%",
+    height: 410,
+    alignSelf: "center",
+    marginBottom: 15,
+  },
+  blockChoose: {
+    width: "100%",
+    height: 180,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  blockIntro: {
+    width: "30%",
+    height: 150,
+    backgroundColor: "green",
+    flexDirection: "column",
+  },
+  introImage: {
+    height: 100,
+    width: "100%",
+    objectFit: "cover",
+  },
+});

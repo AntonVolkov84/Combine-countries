@@ -1,5 +1,3 @@
-import { enableScreens } from "react-native-screens";
-enableScreens();
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -42,6 +40,7 @@ export default function App() {
           component={LanguageScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -49,6 +48,7 @@ export default function App() {
           component={RuleScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -56,6 +56,7 @@ export default function App() {
           component={ConditionsScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -63,6 +64,7 @@ export default function App() {
           component={MainlandScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -70,6 +72,7 @@ export default function App() {
           component={TestScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -77,6 +80,7 @@ export default function App() {
           component={StarScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
         <Stack.Screen
@@ -84,6 +88,7 @@ export default function App() {
           component={StudyScreen}
           options={{
             headerShown: false,
+            animation: "none",
           }}
         />
       </Stack.Navigator>

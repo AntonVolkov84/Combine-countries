@@ -1,49 +1,31 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, View } from "react-native";
-import styled from "styled-components/native";
+import { StyleSheet, Animated, Easing, View } from "react-native";
 
 interface StarsProps {
   stars: number;
 }
 
-const BlockStar = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-`;
-
-const StarText = styled(Animated.Text)`
-  font-size: 30px;
-`;
-
 export default function Stars({ stars }: StarsProps) {
   const animations = useRef<Animated.Value[]>([]);
 
   useEffect(() => {
-    // Обновляем массив анимаций при изменении количества звёзд
     animations.current = Array.from({ length: stars }, (_, i) => new Animated.Value(0));
 
     animations.current.forEach((anim, index) => {
       Animated.loop(
-        Animated.sequence([
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 1000,
-            delay: index * 150,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 0,
-            duration: 5000,
-            useNativeDriver: true,
-          }),
-        ])
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 5000,
+          delay: index * 300,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
       ).start();
     });
   }, [stars]);
 
   return (
-    <BlockStar>
+    <View style={styles.blockStar}>
       {animations.current.map((anim, index) => {
         const rotateY = anim.interpolate({
           inputRange: [0, 1],
@@ -51,16 +33,29 @@ export default function Stars({ stars }: StarsProps) {
         });
 
         return (
-          <StarText
+          <Animated.Text
             key={index}
-            style={{
-              transform: [{ perspective: 800 }, { rotateY }],
-            }}
+            style={[
+              styles.starText,
+              {
+                transform: [{ perspective: 800 }, { rotateY }],
+              },
+            ]}
           >
             ⭐
-          </StarText>
+          </Animated.Text>
         );
       })}
-    </BlockStar>
+    </View>
   );
 }
+const styles = StyleSheet.create({
+  blockStar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  starText: {
+    fontSize: 30,
+  },
+});
