@@ -1,5 +1,6 @@
 interface EducationParams {
   education: boolean;
+  forceRefresh: boolean;
   params?: {
     firstElement: string;
     secondElement: string;

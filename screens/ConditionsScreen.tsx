@@ -28,8 +28,9 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
       return Alert.alert(`${t("conditionAlert")}`);
     }
     setTestVisibility(false);
-    navigation.navigate("MainlandScreen", {
+    navigation.replace("MainlandScreen", {
       education: false,
+      forceRefresh: true,
       params: { firstElement: firstItem, secondElement: secondItem },
     });
   };
@@ -45,7 +46,8 @@ export default function ConditionsScreen({ navigation }: StartScreenProps) {
           style={styles.blockButton}
           onPress={() => {
             setTestVisibility(false);
-            navigation.navigate("MainlandScreen", {
+            navigation.replace("MainlandScreen", {
+              forceRefresh: true,
               education: true,
             });
           }}

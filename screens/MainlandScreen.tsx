@@ -10,7 +10,8 @@ import Africa from "../assets/Africa.png";
 import Asia from "../assets/Asia.png";
 import Super from "../assets/supericon.png";
 import * as SecureStore from "expo-secure-store";
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 type MainlandScreenProps = NativeStackScreenProps<RootStackParamList, "MainlandScreen">;
 
@@ -52,15 +53,16 @@ export default function MainlandScreen({ route, navigation }: MainlandScreenProp
 
   const checkStarForSuperLevel = async (): Promise<void> => {
     const starsForSuperLevel = await getSavedPlayersStars("stars");
-    console.log(starsForSuperLevel);
     if (Number(starsForSuperLevel) >= 4) {
       setSuperLevelVisible(true);
     }
   };
 
-  useLayoutEffect(() => {
-    checkStarForSuperLevel();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      checkStarForSuperLevel();
+    }, [route.params.forceRefresh])
+  );
 
   return (
     <LinearGradient
