@@ -46,7 +46,7 @@ async function getSavedPlayersStars(key: string): Promise<string | null> {
 }
 
 const rewardedInterstatial: RewardedInterstitialAd = RewardedInterstitialAd.createForAdRequest(
-  TestIds.REWARDED_INTERSTITIAL,
+  "ca-app-pub-9267417700367649/7433054221",
   {
     requestNonPersonalizedAdsOnly: true,
   }
